@@ -1,0 +1,21 @@
+paper_len: 10.0
+abs_lead_step: 10
+tickLength: 8 
+tickSize_step: 0.002 
+rhythm_strip_len_seconds: 10.0
+dc_offset_length: 0.2
+columns: 4 # number of columns for the main lead display
+# The precise order of leads for the visual layout (should be a multiple of 'columns')
+desired_order: 
+  - I
+  - aVR
+  - V1
+  - V4
+  - II
+  - aVL
+  - V2
+  - V5
+  - III
+  - aVF
+  - V3
+  - V6
