@@ -14,12 +14,12 @@ def ecg_plot(ecg, configs, sample_rate, columns, rec_file_name, output_dir, lead
     matplotlib.use("Agg")
     if not ecg: return 
 
-    # --- CONFIGURATION LOADING ---
-    # Load all layout and color parameters from the config dictionary with safe defaults.
+    # --- configuration loading ---
+    # load all layout and color parameters from the config dictionary with safe defaults.
     layout_params = configs.get('layout_parameters', {})
     color_configs = configs.get('colors', {})
 
-    # Paper and Grid dimensions
+    # paper and grid dimensions
     width = layout_params.get('width', 11.0)
     height = layout_params.get('height', 8.5)
     y_grid_size = layout_params.get('y_grid_size', 0.5)
@@ -27,15 +27,15 @@ def ecg_plot(ecg, configs, sample_rate, columns, rec_file_name, output_dir, lead
     y_grid_inch = layout_params.get('y_grid_inch', 5/25.4)
     x_grid_inch = layout_params.get('x_grid_inch', 5/25.4)
     
-    # Font and Line properties
+    # font and line properties
     lead_fontsize = layout_params.get('lead_fontsize', 11)
     line_width = layout_params.get('line_width', 0.75)
     
-    # Bounding Box parameters
+    # bounding box parameters
     min_bbox_height_mv = layout_params.get('min_bbox_height_mv', 2.0)
     bbox_vertical_margin_mv = layout_params.get('bbox_vertical_margin_mv', 0.1)
 
-    # --- LAYOUT CALCULATION ---
+    # --- layout calculation ---
     secs = lead_length_in_seconds
     leads_count = len(lead_index)
     rows = int(ceil(leads_count / columns))
@@ -49,22 +49,22 @@ def ecg_plot(ecg, configs, sample_rate, columns, rec_file_name, output_dir, lead
     fig, ax = plt.subplots(figsize=(width, height), dpi=kwargs.get('resolution', 100))
     fig.subplots_adjust(hspace=0, wspace=0, left=0, right=1, bottom=0, top=1)
     
-    # --- MASK MODE LOGIC ---
+    # --- mask mode logic ---
     if generate_mask_mode:
         fig.patch.set_facecolor('black')
         ax.set_facecolor('black')
-        color_line = (1, 1, 1) # White
+        color_line = (1, 1, 1) # white
         show_grid = False
         show_lead_name = False
         show_dc_pulse = False
         bbox = False
     else:
-        # Load colors from the config for realistic mode
+        # load colors from the config for realistic mode
         color_sets = color_configs.get('standard_sets', {})
         selected_color_set = color_sets.get(f'colour{standard_colours}', {})
-        color_major = tuple(selected_color_set.get('major', (1,0,0))) # Default red
-        color_minor = tuple(selected_color_set.get('minor', (0.996,0.8745,0.8588))) # Default pink
-        color_line = (0,0,0) # Black
+        color_major = tuple(selected_color_set.get('major', (1,0,0))) # default red
+        color_minor = tuple(selected_color_set.get('minor', (0.996,0.8745,0.8588))) # default pink
+        color_line = (0,0,0) # black
 
     ax.set_ylim(y_min, y_max); ax.set_xlim(0, x_max)
     ax.tick_params(axis='both', which='both', length=0)

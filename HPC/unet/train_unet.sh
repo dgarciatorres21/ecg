@@ -11,7 +11,7 @@
 #SBATCH --output=${LOG_DIR}/%x_%A_%a.out
 #SBATCH --error=${LOG_DIR}/%x_%A_%a.err
 
-# USAGE CHECK
+# usage check
 if [ "$#" -ne 1 ]; then
     echo "ERROR: You must provide a model type."
     echo "Usage: sbatch $0 <MODEL_TYPE>"
@@ -21,7 +21,7 @@ fi
 
 MODEL_TYPE=$1
 
-# CONFIGURATION based on MODEL_TYPE
+# configuration based on model_type
 if [ "$MODEL_TYPE" == "12L" ]; then
     DATASET_ID=7
     JOB_NAME="train_D7_12L_folds"
@@ -36,28 +36,28 @@ else
 fi
 
 
-# DYNAMIC JOB NAME UPDATE
-# This command will only work when the script is run via sbatch
+# dynamic job name update
+# this command will only work when the script is run via sbatch
 if [ -n "$SLURM_JOB_ID" ]; then
     scontrol update jobid=${SLURM_JOB_ID} jobname=${JOB_NAME}
 fi
 
-# SETUP
+# setup
 mkdir -p $LOG_DIR
 module load Anaconda3/2024.02-1
 source /opt/apps/testapps/common/software/staging/Anaconda3/2024.02-1/etc/profile.d/conda.sh
 conda activate unet
 
-# SET nnU-Net PATHS
+# set nnu-net paths
 export nnUNet_raw="/mnt/parscratch/users/lip24dg/data/Generated_data"
 export nnUNet_preprocessed="/mnt/parscratch/users/lip24dg/data/Generated_data/nnUNet_preprocessed"
 export nnUNet_results="/mnt/parscratch/users/lip24dg/data/Generated_data/nnUNet_results"
 
 export nnUNet_compile="0"
 
-# RUN TRAINING
-# The $SLURM_ARRAY_TASK_ID variable is set by SLURM when this script is run as a job array.
-# If it's empty, it means the script was likely not run via sbatch.
+# run training
+# the $slurm_array_task_id variable is set by slurm when this script is run as a job array.
+# if it's empty, it means the script was likely not run via sbatch.
 if [ -z "$SLURM_ARRAY_TASK_ID" ]; then
     echo "ERROR: This script must be submitted as a job to SLURM using 'sbatch'."
     echo "The SLURM_ARRAY_TASK_ID is not set."

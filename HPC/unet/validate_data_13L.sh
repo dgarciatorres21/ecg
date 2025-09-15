@@ -8,17 +8,17 @@
 #SBATCH --output=/users/lip24dg/ecg/HPC/logs_nnunet/validate_data_%A_out.txt
 #SBATCH --error=/users/lip24dg/ecg/HPC/logs_nnunet/validate_data_%A_err.txt
 
-# SETUP
+# setup
 echo "--- Setting up environment for Data Validation"
 module load Anaconda3/2024.02-1
 source activate unet
 
-# DEFINE SCRIPT PATH
+# define script path
 PYTHON_SCRIPT_PATH="/users/lip24dg/ecg/code-unet/validate_data_pairs_13L.py"
 
 echo "Running validation script..."
 
-# EXECUTE SCRIPT
+# execute script
 python "${PYTHON_SCRIPT_PATH}"
 
 echo "Validation complete."

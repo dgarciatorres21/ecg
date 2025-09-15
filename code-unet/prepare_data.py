@@ -9,8 +9,8 @@ import random
 import json
 import shutil
 
-# NEW: TOP-LEVEL CONFIGURATION
-# Define your four data sources. The 'key' will be used for the test folder name.
+# new: top-level configuration
+# define your four data sources. the 'key' will be used for the test folder name.
 DATA_SOURCES = {
     "clean": {
         "images": "/mnt/parscratch/users/lip24dg/data/final_dataset/Cropped_Images",
@@ -30,12 +30,12 @@ DATA_SOURCES = {
     }
 }
 
-# The single nnU-Net dataset ID for the combined training set
+# the single nnu-net dataset id for the combined training set
 TARGET_DATASET_ID = 3
-TARGET_DATASET_NAME = f"Dataset{TARGET_DATASET_ID:03d}_ecg_robust" # A more descriptive name
+TARGET_DATASET_NAME = f"Dataset{TARGET_DATASET_ID:03d}_ecg_robust" # a more descriptive name
 
 def convert_to_nifti(image_path, mask_path, out_image_path, out_mask_path):
-    # (This function remains unchanged)
+    # (this function remains unchanged)
     img = cv2.imread(image_path, cv2.IMREAD_GRAYSCALE)
     msk = cv2.imread(mask_path, cv2.IMREAD_GRAYSCALE)
     if img is None or msk is None: return False
@@ -49,7 +49,7 @@ def convert_to_nifti(image_path, mask_path, out_image_path, out_mask_path):
     return True
 
 def process_ecg_subset(ecg_ids, ecg_to_images_map, args, dest_img_dir, dest_lbl_dir, set_name):
-    # (This helper function remains unchanged)
+    # (this helper function remains unchanged)
     total_cases = 0
     for ecg_id in tqdm(ecg_ids, desc=f"Processing {set_name}"):
         for img_file in ecg_to_images_map[ecg_id]:
@@ -69,14 +69,14 @@ def main():
     parser.add_argument("--test-split", type=float, default=0.2, help="Fraction of data to use for the test sets.")
     args = parser.parse_args()
 
-    # 1. Main nnU-Net Training Directory
+    # 1. main nnu-net training directory
     train_dataset_dir = os.path.join(args.output_root, TARGET_DATASET_NAME)
     imagesTr_dir = os.path.join(train_dataset_dir, "imagesTr")
     labelsTr_dir = os.path.join(train_dataset_dir, "labelsTr")
     os.makedirs(imagesTr_dir, exist_ok=True)
     os.makedirs(labelsTr_dir, exist_ok=True)
 
-    # 2. Separate Test Set Directories (outside the nnU-Net folder)
+    # 2. separate test set directories (outside the nnu-net folder)
     test_sets_root_dir = os.path.join(args.output_root, "structured_test_sets")
     test_dirs = {}
     for key in DATA_SOURCES.keys():
@@ -90,7 +90,7 @@ def main():
     print(f"Training data will be saved to: {train_dataset_dir}")
     print(f"Test sets will be saved to: {test_sets_root_dir}")
 
-    # GATHER AND SPLIT ALL DATA
+    # gather and split all data
     ecg_to_images = {}
     all_ecg_ids = set()
 
@@ -101,7 +101,7 @@ def main():
         for fname in all_images:
             ecg_id = '_'.join(fname.split('_')[:-1])
             all_ecg_ids.add(ecg_id)
-            # Store where this specific file can be found
+            # store where this specific file can be found
             if ecg_id not in ecg_to_images: ecg_to_images[ecg_id] = {}
             if source_key not in ecg_to_images[ecg_id]: ecg_to_images[ecg_id][source_key] = []
             ecg_to_images[ecg_id][source_key].append(fname)
@@ -115,7 +115,7 @@ def main():
     test_ecgs = all_ecg_ids[split_index:]
     print(f"Total unique ECG IDs: {len(all_ecg_ids)}, Training IDs: {len(train_ecgs)}, Testing IDs: {len(test_ecgs)}")
 
-    # PROCESS AND SAVE TRAINING SET
+    # process and save training set
     train_cases = 0
     print("\nProcessing combined training set...")
     for ecg_id in tqdm(train_ecgs, desc="Training Set"):
@@ -130,7 +130,7 @@ def main():
                 ok = convert_to_nifti(img_path, mask_path, out_img, out_msk)
                 if ok: train_cases += 1
     
-    # PROCESS AND SAVE SEPARATE TEST SETS
+    # process and save separate test sets
     print("\nProcessing separate test sets...")
     for ecg_id in tqdm(test_ecgs, desc="Test Sets"):
         for source_key, files in ecg_to_images.get(ecg_id, {}).items():
@@ -146,7 +146,7 @@ def main():
                 out_msk = os.path.join(dest_lbl_dir, img_file.replace(".png", ".nii.gz"))
                 convert_to_nifti(img_path, mask_path, out_img, out_msk)
 
-    # GENERATE DATASET.JSON FOR THE TRAINING SET
+    # generate dataset.json for the training set
     generate_dataset_json(train_dataset_dir, train_cases, {"0": "ecg_lead"}, {"background": 0, "foreground": 1})
 
     print(f"\nProcessing complete. Created {train_cases} training cases.")

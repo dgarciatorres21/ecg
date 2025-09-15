@@ -2,7 +2,7 @@ from ultralytics import YOLO
 import os
 
 def main():
-    # Load the specific checkpoint you want to resume from
+    # load the specific checkpoint you want to resume from
     model_checkpoint_path = '/users/lip24dg/ecg/ecg-yolo/runs/yolo_ecg_model4/weights/last.pt'
     
     if not os.path.exists(model_checkpoint_path):
@@ -13,10 +13,10 @@ def main():
     print(f"Attempting to resume training from checkpoint: {model_checkpoint_path}")
     model = YOLO(model_checkpoint_path) 
 
-    # Train the model
+    # train the model
     print("Continuing YOLOv8 training...")
     
-    # The trainer will automatically read the epoch number and optimizer state from the checkpoint.
+    # the trainer will automatically read the epoch number and optimizer state from the checkpoint.
     results = model.train(
         resume=True
     )

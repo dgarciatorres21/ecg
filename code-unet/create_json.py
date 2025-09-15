@@ -3,7 +3,7 @@ import json
 import argparse
 
 def generate_dataset_json(dataset_dir, channel_names_str, labels_str):
-    # Creates dataset.json file required by nnU-Net.
+    # creates dataset.json file required by nnu-net.
     if not os.path.isdir(dataset_dir):
         print(f"Error: Dataset directory not found at {dataset_dir}")
         return

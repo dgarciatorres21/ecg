@@ -1,26 +1,26 @@
-# File: run_demo.py
+# file: run_demo.py
 
 import os
 from ultralytics import YOLO
 
-# MODEL_TYPE can be 'LL' or '12L'
+# model_type can be 'll' or '12l'
 MODEL_TYPE_TO_RUN = '12L'
 
-# Model Paths
+# model paths
 MODELS = {
     'LL': 'C:/Users/dgarc/Desktop/Dissertation/ecg-image-kit/codes/code-yolo/models/runs/yolo_ecg_model4/weights/best.pt',
     '12L': 'C:/Users/dgarc/Desktop/Dissertation/ecg-image-kit/codes/code-yolo/models/runs_12L/yolo_ecg_model_12L3/weights/best.pt'
 }
 
-# Directory to the Image Datasets
+# directory to the image datasets
 INPUT_DIR = "C:/Users/dgarc/Desktop/Dissertation/ecg-image-kit/codes/demo/data/yolo/input"
-# Directory to save the output images
+# directory to save the output images
 OUTPUT_DIR = "C:/Users/dgarc/Desktop/Dissertation/ecg-image-kit/codes/demo/data/yolo/output/demo_predictions"
 
 
 print("Starting Local YOLO Model Demo")
 
-# Select the model
+# select the model
 selected_model_path = MODELS.get(MODEL_TYPE_TO_RUN)
 
 print(f"Model Type: {MODEL_TYPE_TO_RUN}")
@@ -30,26 +30,26 @@ print(f"Looking for Images in: {INPUT_DIR}")
 print("-----------------------------------------")
 
 
-# 3. VALIDATION AND SETUP
-# Check if the model path is valid
+# 3. validation and setup
+# check if the model path is valid
 if not selected_model_path or not os.path.exists(selected_model_path):
     print(f"FATAL ERROR: Model file not found at '{selected_model_path}'")
     print("Please check the 'MODELS' dictionary in the configuration section.")
     exit()
 
-# Check if the image directory exists
+# check if the image directory exists
 if not INPUT_DIR or not os.path.isdir(INPUT_DIR):
     print(f"FATAL ERROR: Image directory not found at '{INPUT_DIR}'")
     print("Please check the 'INPUT_DIR' variable in the configuration section.")
     exit()
 
-# Create the output directory if it doesn't exist
+# create the output directory if it doesn't exist
 os.makedirs(OUTPUT_DIR, exist_ok=True)
 print(f"Results will be saved in the '{OUTPUT_DIR}' folder.\n")
 
 
-# 4. EXECUTE THE DEMO
-# Load the model
+# 4. execute the demo
+# load the model
 try:
     model = YOLO(selected_model_path)
     class_names = model.names
@@ -57,7 +57,7 @@ except Exception as e:
     print(f"FATAL ERROR: Could not load the YOLO model. Error: {e}")
     exit()
 
-# Get a list of all files in the input directory
+# get a list of all files in the input directory
 all_files = os.listdir(INPUT_DIR)
 image_files = [f for f in all_files if f.lower().endswith(('.png', '.jpg', '.jpeg'))]
 
@@ -67,9 +67,9 @@ if not image_files:
     
 print(f"Found {len(image_files)} images to process.")
 
-# Loop through the discovered image files
+# loop through the discovered image files
 for image_filename in image_files:
-    # Construct the full path to the current image
+    # construct the full path to the current image
     full_image_path = os.path.join(INPUT_DIR, image_filename)
 
     if not os.path.exists(full_image_path):
@@ -78,15 +78,15 @@ for image_filename in image_files:
 
     print(f"Processing: {image_filename}")
     
-    # Run prediction
+    # run prediction
     results = model.predict(full_image_path, verbose=False)
     
     result = results[0]
     
-    # Define the path for the output image
+    # define the path for the output image
     output_path = os.path.join(OUTPUT_DIR, f"predicted_{image_filename}")
     
-    # Print found objects to the console
+    # print found objects to the console
     if len(result.boxes) == 0:
         print("  No objects detected.")
     else:
@@ -98,7 +98,7 @@ for image_filename in image_files:
             coords = box.xyxy[0].tolist() # [x1, y1, x2, y2]
             print(f"    - Class: {class_name}, Confidence: {confidence:.2f}, Coords: {[round(c) for c in coords]}")
 
-    # Save the image with bounding boxes
+    # save the image with bounding boxes
     result.save(filename=output_path)
     print(f"  > Saved annotated image to: {output_path}\n")
 

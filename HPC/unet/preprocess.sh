@@ -20,23 +20,23 @@ fi
 
 MODEL_TYPE=$1
 
-# Dynamically update the job name for better tracking
+# dynamically update the job name for better tracking
 scontrol update jobid=${SLURM_JOB_ID} jobname=preprocess_${MODEL_TYPE}
 
-# SETUP
+# setup
 echo "--- Setting up environment for Preprocessing"
 module load Anaconda3/2024.02-1
 source activate unet
 
-# SET nnU-Net PATHS
+# set nnU-net paths
 export nnUNet_raw="/mnt/parscratch/users/lip24dg/data/Generated_data"
 export nnUNet_preprocessed="/mnt/parscratch/users/lip24dg/data/Generated_data/nnUNet_preprocessed"
 export nnUNet_results="/mnt/parscratch/users/lip24dg/data/Generated_data/nnUNet_results"
 
-# Dynamically set the Dataset ID based on the argument
+# dynamically set the dataset id based on the argument
 if [ "$MODEL_TYPE" == "12L" ]; then
     DATASET_ID=7
-else # This will be the "LL" model
+else # this will be the "LL" model
     DATASET_ID=8
 fi
 
@@ -44,7 +44,7 @@ echo "--- Starting nnU-Net v2 Planning and Preprocessing for Dataset ${DATASET_I
 
 nnUNetv2_plan_and_preprocess -d ${DATASET_ID} --verify_dataset_integrity
 
-# Added a safety check for robustness
+# added a safety check for robustness
 if [ $? -ne 0 ]; then
     echo "ERROR: nnUNetv2_plan_and_preprocess failed for Dataset ${DATASET_ID}."
     exit 1

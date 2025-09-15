@@ -1,31 +1,31 @@
 # parent path cleaner
 path: /mnt/parscratch/users/lip24dg/
 
-# List of all training image directories
+# list of all training image directories
 train:
   - data/final_dataset_augmented_12L/yolo_split_data_Clean/train/images
   - data/final_dataset_augmented_12L/yolo_split_data_Chaos/train/images
   - data/final_dataset_augmented_12L/yolo_split_data_Physical/train/images
   - data/final_dataset_augmented_12L/yolo_split_data_Scanner/train/images
 
-# List of all validation image directories
+# list of all validation image directories
 val:
   - data/final_dataset_augmented_12L/yolo_split_data_Clean/valid/images
   - data/final_dataset_augmented_12L/yolo_split_data_Chaos/valid/images
   - data/final_dataset_augmented_12L/yolo_split_data_Physical/valid/images
   - data/final_dataset_augmented_12L/yolo_split_data_Scanner/valid/images
 
-# List of all test image directories (optional, but good for final evaluation)
+# list of all test image directories (optional, but good for final evaluation)
 test:
   - data/final_dataset_augmented_12L/yolo_split_data_Clean/test/images
   - data/final_dataset_augmented_12L/yolo_split_data_Chaos/test/images
   - data/final_dataset_augmented_12L/yolo_split_data_Physical/test/images
   - data/final_dataset_augmented_12L/yolo_split_data_Scanner/test/images
 
-# Number of classes
+# number of classes
 nc: 12
 
-# Class names (in order of their class_id)
+# class names (in order of their class_id)
 names:
   0: I
   1: II

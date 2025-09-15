@@ -5,7 +5,7 @@ tickSize_step: 0.002
 rhythm_strip_len_seconds: 10.0
 dc_offset_length: 0.2
 columns: 4 # number of columns for the main lead display
-# The precise order of leads for the visual layout
+# the precise order of leads for the visual layout
 desired_order: 
   - I
   - aVR
@@ -20,40 +20,40 @@ desired_order:
   - V3
   - V6
 
-# ECG PAPER LAYOUT PARAMETERS
+# ecg paper layout parameters
 layout_parameters:
-  # Paper dimensions in inches (standard US Letter)
+  # paper dimensions in inches (standard us letter)
   width: 11.0
   height: 8.5
 
-  # Grid spacing in mV (vertical) and seconds (horizontal)
+  # grid spacing in mv (vertical) and seconds (horizontal)
   y_grid_size: 0.5
   x_grid_size: 0.2
 
-  # Physical size of a major grid box in inches (standard is 5mm)
-  # The value is 5 / 25.4, pre-calculated
+  # physical size of a major grid box in inches (standard is 5mm)
+  # the value is 5 / 25.4, pre-calculated
   y_grid_inch: 0.19685 
   x_grid_inch: 0.19685
   
-  # Line widths for plotting
+  # line widths for plotting
   grid_line_width: 0.5
   line_width: 0.75
 
-  # Font and text properties
+  # font and text properties
   lead_fontsize: 11
 
-  # Spacing and layout properties
+  # spacing and layout properties
   x_gap: 1.0
   row_height: 8.0
-  dc_offset_length: 0.2 # Length of the calibration pulse in seconds
+  dc_offset_length: 0.2 # length of the calibration pulse in seconds
 
-  # Bounding box calculation parameters
+  # bounding box calculation parameters
   min_bbox_height_mv: 2.0
   bbox_vertical_margin_mv: 0.1
 
-# COLORS
+# colors
 colors:
   standard_sets:
     colour5:
-      major: [1, 0, 0] # Red
-      minor: [0.996, 0.8745, 0.8588] # Light Pinkish
+      major: [1, 0, 0] # red
+      minor: [0.996, 0.8745, 0.8588] # light pinkish

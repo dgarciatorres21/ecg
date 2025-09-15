@@ -91,7 +91,7 @@ def main():
         image_dir = paths["images"]
         if not os.path.isdir(image_dir): continue
         for fname in sorted([f for f in os.listdir(image_dir) if f.endswith(".png")]):
-            ecg_id = '_'.join(fname.split('_')[:-1])
+            ecg_id = "_".join(fname.split('_')[:-1])
             if ecg_id not in ecg_to_images_map: ecg_to_images_map[ecg_id] = {}
             if source_key not in ecg_to_images_map[ecg_id]: ecg_to_images_map[ecg_id][source_key] = []
             ecg_to_images_map[ecg_id][source_key].append(fname)

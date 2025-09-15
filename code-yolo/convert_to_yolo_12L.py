@@ -4,13 +4,13 @@ import argparse
 from PIL import Image
 from tqdm import tqdm
 
-# Removed 'L': 12
+# removed 'l': 12
 CLASS_MAP = {
     'I': 0, 'II': 1, 'III': 2, 'aVR': 3, 'aVL': 4, 'aVF': 5,
     'V1': 6, 'V2': 7, 'V3': 8, 'V4': 9, 'V5': 10, 'V6': 11
 }
 
-rhythm_WIDTH_THRESHOLD = 1000 # This threshold is used to distinguish the long rhythm strip from the standard Lead II
+rhythm_WIDTH_THRESHOLD = 1000 # this threshold is used to distinguish the long rhythm strip from the standard lead ii
 
 def convert_corners_to_xywh(corners_dict):
     points = list(corners_dict.values())
@@ -62,17 +62,17 @@ def process_json_annotations(data_dir, yolo_labels_dir):
                 xywh_bbox = convert_corners_to_xywh(corners)
                 class_id = -1
                 
-                # Updated logic to exclude the long rhythm strip
+                # updated logic to exclude the long rhythm strip
                 if lead_name == 'II':
                     box_width = xywh_bbox[2]
-                    # ONLY if the box is smaller than the threshold = standard Lead II.
+                    # only if the box is smaller than the threshold = standard lead ii.
                     if box_width <= rhythm_WIDTH_THRESHOLD:
                         class_id = CLASS_MAP['II']
                 elif lead_name in CLASS_MAP:
-                    # This handles all other leads
+                    # this handles all other leads
                     class_id = CLASS_MAP[lead_name]
                 
-                # Only if a valid class_id was assigned, convert and save the line.
+                # only if a valid class_id was assigned, convert and save the line.
                 if class_id != -1:
                     x_center, y_center, w_norm, h_norm = convert_bbox_to_yolo(xywh_bbox, img_width, img_height)
                     yolo_lines.append(f"{class_id} {x_center:.6f} {y_center:.6f} {w_norm:.6f} {h_norm:.6f}")

@@ -11,13 +11,13 @@
 #SBATCH --mail-user=dgarcia3@sheffield.ac.uk
 #SBATCH --mail-type=FAIL,END
 
-# --- DIAGNOSTICS ---
-echo "========================================"
+# --- diagnostics ---
+echo "========================================="
 echo "YOLO Training Pipeline Job started on $(hostname) at $(date)"
 echo "Job ID: ${SLURM_JOB_ID}"
-echo "========================================"
+echo "========================================="
 
-# --- SETUP ---
+# --- setup ---
 echo "Setting up the job environment..."
 module load Anaconda3/2024.02-1
 source activate yolo
@@ -29,59 +29,59 @@ YOLO_SCRIPTS_DIR="${PROJECT_DIR}/ecg-yolo"
 BASE_INPUT_DIR="/mnt/parscratch/users/lip24dg/data/final_dataset_augmented"
 BASE_OUTPUT_DIR="/mnt/parscratch/users/lip24dg/data/final_dataset_augmented_12L"
 
-# --- Dynamical paths based on the BUCKET_TYPE ---
-# Input directory for JSON/PNG files
-# CONVERSION_INPUT_DIR="${BASE_INPUT_DIR}/Generated_Images_${BUCKET_TYPE}"
-# Output directory for the generated YOLO label files (.txt)
+# --- dynamical paths based on the bucket_type ---
+# input directory for json/png files
+# conversion_input_dir="${base_input_dir}/generated_images_${bucket_type}"
+# output directory for the generated yolo label files (.txt)
 LABEL_OUTPUT_DIR="${BASE_OUTPUT_DIR}/yolo_labels_${BUCKET_TYPE}"
-# # Output directory for the final split dataset (train/valid/test)
-# SPLIT_DATA_OUTPUT_DIR="${BASE_OUTPUT_DIR}/yolo_split_data_${BUCKET_TYPE}"
+# # output directory for the final split dataset (train/valid/test)
+# split_data_output_dir="${base_output_dir}/yolo_split_data_${bucket_type}"
 
-# --- Print paths for easy debugging ---
-# echo "Source Data Directory : ${CONVERSION_INPUT_DIR}"
-echo "YOLO Labels Directory : ${LABEL_OUTPUT_DIR}"
-# echo "Split Data Directory  : ${SPLIT_DATA_OUTPUT_DIR}"
+# --- print paths for easy debugging ---
+# echo "source data directory : ${conversion_input_dir}"
+# echo "yolo labels directory : ${label_output_dir}"
+# echo "split data directory  : ${split_data_output_dir}"
 
-# if [ ! -d "$CONVERSION_INPUT_DIR" ]; then
-#     echo "FATAL ERROR: Source data directory not found at ${CONVERSION_INPUT_DIR}"
+# if [ ! -d "$conversion_input_dir" ]; then
+#     echo "fatal error: source data directory not found at ${conversion_input_dir}"
 #     exit 1
 # fi
 
-# --- PIPELINE EXECUTION ---
+# --- pipeline execution ---
 
-# # Step 1: Convert JSON annotations to YOLO format for the specified bucket
-# echo "--- Step 1: Converting JSON to YOLO format for bucket '${BUCKET_TYPE}' ---"
-# python3 "${YOLO_SCRIPTS_DIR}/convert_to_yolo_12L.py" \
-#     --data-dir "${CONVERSION_INPUT_DIR}" \
-#     --output-dir "${LABEL_OUTPUT_DIR}"
+# # step 1: convert json annotations to yolo format for the specified bucket
+# echo "--- step 1: converting json to yolo format for bucket '${bucket_type}' ---"
+# python3 "${yolo_scripts_dir}/convert_to_yolo_12l.py" \
+#     --data-dir "${conversion_input_dir}" \
+#     --output-dir "${label_output_dir}"
 
 # if [ $? -ne 0 ]; then
-#     echo "ERROR: Step 1 (convert_to_yolo) failed. Exiting."
+#     echo "error: step 1 (convert_to_yolo) failed. exiting."
 #     exit 1
 # fi
 
-# # Step 2: Split data into train/valid/test sets
-# echo "--- Step 2: Splitting data ---"
-# # Note: The label source for this step is the output from the previous step.
-# python3 "${YOLO_SCRIPTS_DIR}/split_data.py" \
-#     --image-source-dir "${CONVERSION_INPUT_DIR}" \
-#     --label-source-dir "${LABEL_OUTPUT_DIR}" \
-#     --output-dir "${SPLIT_DATA_OUTPUT_DIR}"
+# # step 2: split data into train/valid/test sets
+# echo "--- step 2: splitting data ---"
+# # note: the label source for this step is the output from the previous step.
+# python3 "${yolo_scripts_dir}/split_data.py" \
+#     --image-source-dir "${conversion_input_dir}" \
+#     --label-source-dir "${label_output_dir}" \
+#     --output-dir "${split_data_output_dir}"
 
 # if [ $? -ne 0 ]; then
-#     echo "ERROR: Step 2 (split_data) failed. Exiting."
+#     echo "error: step 2 (split_data) failed. exiting."
 #     exit 1
 # fi
 
-# echo "========================================"
-# echo "Pipeline completed successfully for bucket: ${BUCKET_TYPE}"
-# echo "========================================"
+# echo "========================================="
+# echo "pipeline completed successfully for bucket: ${bucket_type}"
+# echo "========================================="
 
-echo "========================================"
+echo "========================================="
 echo "Start training"
-echo "========================================"
+echo "========================================="
 
-# Step 3: Train the YOLOv8 model
+# step 3: train the yolov8 model
 echo "--- Step 3: Training the model ---"
 python "${YOLO_SCRIPTS_DIR}/Train_12L.py"
 if [ $? -ne 0 ]; then
@@ -89,6 +89,6 @@ if [ $? -ne 0 ]; then
     exit 1
 fi
 
-echo "========================================"
+echo "========================================="
 echo "Finish training"
-echo "========================================"
+echo "========================================="

@@ -4,8 +4,8 @@
 #SBATCH --nodes=1
 #SBATCH --mem=8G
 #SBATCH --cpus-per-task=2
-#SBATCH --time=00:30:00  # Each job is now much faster
-#SBATCH --array=0-3      # Launch 4 jobs, with IDs 0, 1, 2, 3
+#SBATCH --time=00:30:00  # each job is now much faster
+#SBATCH --array=0-3      # launch 4 jobs, with IDs 0, 1, 2, 3
 #SBATCH --output=/users/lip24dg/ecg/HPC/logs_nnunet/evaluate_official_%x_%A_%a.out
 #SBATCH --error=/users/lip24dg/ecg/HPC/logs_nnunet/evaluate_official_%x_%A_%a.err
 
@@ -18,7 +18,7 @@ fi
 
 MODEL_TYPE=$1
 
-# Dynamically update the job name
+# dynamically update the job name
 scontrol update jobid=${SLURM_JOB_ID} jobname=evaluate_${MODEL_TYPE}
 
 # setup
@@ -30,18 +30,18 @@ export nnUNet_raw="/mnt/parscratch/users/lip24dg/data/Generated_data"
 export nnUNet_preprocessed="/mnt/parscratch/users/lip24dg/data/Generated_data/nnUNet_preprocessed"
 export nnUNet_results="/mnt/parscratch/users/lip24dg/data/Generated_data/nnUNet_results"
 
-# Dynamically set paths based on the model type
+# dynamically set paths based on the model type
 if [ "$MODEL_TYPE" == "12L" ]; then
     DATASET_ID=7
     DATASET_NAME="Dataset00${DATASET_ID}_ecg_12L"
     TEST_SETS_BASE_DIR="/mnt/parscratch/users/lip24dg/data/Generated_data/structured_test_sets_12L"
-else # LL model
+else # ll model
     DATASET_ID=8
     DATASET_NAME="Dataset00${DATASET_ID}_LL"
     TEST_SETS_BASE_DIR="/mnt/parscratch/users/lip24dg/data/Generated_data/structured_test_sets_LL"
 fi
 
-# Map the SLURM Array Task ID to the Test Set Name (parallelization)
+# map the slurm array task id to the test set name (parallelization)
 TEST_SETS_ARRAY=("test_clean" "test_scanner" "test_physical" "test_chaos")
 CURRENT_TEST_SET=${TEST_SETS_ARRAY[$SLURM_ARRAY_TASK_ID]}
 
@@ -50,7 +50,7 @@ if [ -z "$CURRENT_TEST_SET" ]; then
     exit 1
 fi
 
-# Construct paths for this specific job
+# construct paths for this specific job
 PRED_DIR="${nnUNet_results}/${DATASET_NAME}/predictions/${CURRENT_TEST_SET}"
 GT_DIR="${TEST_SETS_BASE_DIR}/${CURRENT_TEST_SET}/labelsTs"
 OUTPUT_JSON="${nnUNet_results}/${DATASET_NAME}/evaluation/summary_${CURRENT_TEST_SET}.json"

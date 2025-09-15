@@ -1,4 +1,4 @@
-#SLURM CONFIGURATION
+#slurm configuration
 #SBATCH --job-name=yolo_eval
 #SBATCH --partition=gpu
 #SBATCH --gres=gpu:1
@@ -11,13 +11,14 @@
 #SBATCH --mail-user=dgarcia3@sheffield.ac.uk
 #SBATCH --mail-type=FAIL,END
 
-#1. ARGUMENT VALIDATION
+#1. argument validation
 MODEL_TYPE=$1
 DATASET_TYPE=$2
 
 scontrol update jobid=${SLURM_JOB_ID} name="eval_${MODEL_TYPE}_${DATASET_TYPE}"
 
-echo "--- Starting UNIFIED YOLO Model Evaluation ---"
+echo "--- Starting UNIFIED YOLO Model Evaluation --"
+
 echo "Job ID: ${SLURM_JOB_ID}"
 echo "Model Type: ${MODEL_TYPE}, Dataset Type: ${DATASET_TYPE}"
 echo "-----------------------------------------"
@@ -30,14 +31,14 @@ if [ -z "$MODEL_TYPE" ] || [ -z "$DATASET_TYPE" ]; then
     exit 1
 fi
 
-#2. CONFIGURATION
+#2. configuration
 EVAL_SCRIPT="/users/lip24dg/ecg/ecg-yolo/evaluation.py"
 
-# Model LL Config
+# model ll config
 MODEL_LL="/users/lip24dg/ecg/ecg-yolo/runs/yolo_ecg_model3/weights/best.pt"
 DATA_YAML_LL="/users/lip24dg/ecg/ecg-yolo/data.yaml"
 
-# Model 12L Config
+# model 12l config
 MODEL_12L="/users/lip24dg/ecg/ecg-yolo/runs_12L/yolo_ecg_model_12L3/weights/best.pt"
 DATA_YAML_12L="/users/lip24dg/ecg/ecg-yolo/data_12L.yaml"
 
@@ -54,15 +55,15 @@ BASE_PATHS=(
     ["12L_scanner"]="/mnt/parscratch/users/lip24dg/data/final_dataset_augmented_12L/yolo_split_data_Scanner"
 )
 
-# Test directories are now always the same relative path
+# test directories are now always the same relative path
 TEST_DIR_RELATIVE="test/images"
 
-#Activate Conda Environment
+#activate conda environment
 echo "Activating Conda environment..."
 module load Anaconda3/2024.02-1
 source activate yolo
 
-#3. DYNAMICALLY CONFIGURATION
+#3. dynamically configuration
 SELECTED_MODEL_PATH=""
 SELECTED_DATA_YAML=""
 SELECTED_BASE_PATH=""
@@ -82,7 +83,7 @@ else
     exit 1
 fi
 
-# Validate that the dataset key was found
+# validate that the dataset key was found
 if [ -z "$SELECTED_BASE_PATH" ]; then
     echo "FATAL ERROR: Invalid dataset type '${DATASET_TYPE}' for model '${MODEL_TYPE}'."
     exit 1
@@ -94,7 +95,7 @@ echo "Base Path: ${SELECTED_BASE_PATH}"
 echo "Test Dir (Relative): ${TEST_DIR_RELATIVE}"
 echo "-----------------------------------------"
 
-#4. EXECUTE THE UNIFIED EVALUATION SCRIPT
+#4. execute the unified evaluation script
 python "$EVAL_SCRIPT" \
     --model-path "$SELECTED_MODEL_PATH" \
     --data-yaml "$SELECTED_DATA_YAML" \

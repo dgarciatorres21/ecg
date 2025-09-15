@@ -6,7 +6,7 @@ from tqdm import tqdm
 DATA_DIR = '../ecg-image-generator/outputData/Generated_data'
 
 def convert_corners_to_xywh(corners_dict):
-    """Helper function to get bbox, copied from your script."""
+    """Helper function to get bbox"""
     points = list(corners_dict.values())
     x_coords = [p[0] for p in points]
     y_coords = [p[1] for p in points]
@@ -41,7 +41,7 @@ def find_bad_annotations():
                 corners = lead_info['lead_bounding_box']
                 x_min, y_min, w, h = convert_corners_to_xywh(corners)
 
-                # The crucial check
+                # the crucial check
                 if (x_min + w) > img_width or (y_min + h) > img_height:
                     print(f"--- ERROR FOUND in {json_filename} ---")
                     print(f"  Image dimensions: width={img_width}, height={img_height}")

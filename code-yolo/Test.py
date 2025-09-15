@@ -10,10 +10,10 @@ def main():
     OUTPUT_VIS_DIR = 'test_predictions_yolov8'
     CONFIDENCE_THRESHOLD = 0.5
 
-    # Create output directory
+    # create output directory
     os.makedirs(OUTPUT_VIS_DIR, exist_ok=True)
 
-    # Load the trained YOLOv8 model
+    # load the trained yolov8 model
     try:
         model = YOLO(MODEL_PATH)
     except Exception as e:
@@ -21,18 +21,18 @@ def main():
         print(f"Please make sure the model path is correct: '{MODEL_PATH}'")
         return
 
-    # Run Inference on all test images
+    # run inference on all test images
     image_files = [f for f in os.listdir(TEST_IMAGE_DIR) if f.endswith(('.png', '.jpg', '.jpeg'))]
     print(f"Found {len(image_files)} images in '{TEST_IMAGE_DIR}'")
     print(f"Running inference and saving results to '{OUTPUT_VIS_DIR}'...")
 
     for image_file in image_files:
         image_path = os.path.join(TEST_IMAGE_DIR, image_file)
-        # Perform Prediction
+        # perform prediction
         results = model.predict(source=image_path, conf=CONFIDENCE_THRESHOLD)
-        # Visualize the results
+        # visualize the results
         result_image_with_boxes = results[0].plot()
-        # Save the visualized
+        # save the visualized
         output_image_path = os.path.join(OUTPUT_VIS_DIR, image_file)
         cv2.imwrite(output_image_path, result_image_with_boxes)
 
@@ -44,14 +44,14 @@ def main():
         first_image_path = os.path.join(TEST_IMAGE_DIR, image_files[0])
         results = model.predict(source=first_image_path, conf=CONFIDENCE_THRESHOLD)
         
-        # Get the Boxes object
+        # get the boxes object
         boxes = results[0].boxes
         
         for box in boxes:
-            # Get coordinates in (x_min, y_min, x_max, y_max) format
+            # get coordinates in (x_min, y_min, x_max, y_max) format
             xyxy = box.xyxy[0].cpu().numpy() 
             
-            # Get confidence score and class ID
+            # get confidence score and class id
             confidence = box.conf[0].item()
             class_id = int(box.cls[0].item())
             class_name = model.names[class_id]

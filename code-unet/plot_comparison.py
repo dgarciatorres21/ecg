@@ -21,7 +21,7 @@ def main():
 
     os.makedirs(output_plot_dir, exist_ok=True)
 
-    # Find common files to compare
+    # find common files to compare
     pred_files = {f for f in os.listdir(predicted_csv_dir) if f.endswith('.csv')}
     gt_files = {f for f in os.listdir(ground_truth_csv_dir) if f.endswith('.csv')}
     common_files = sorted(list(pred_files.intersection(gt_files)))
@@ -37,18 +37,18 @@ def main():
         print(f"Plotting all {len(common_files)} available signals...")
         files_to_plot = common_files
 
-    # --- Loop through the sample and generate plots ---
+    # --- loop through the sample and generate plots ---
     for csv_filename in tqdm(files_to_plot, desc="Generating Plots"):
         try:
             pred_path = os.path.join(predicted_csv_dir, csv_filename)
             gt_path = os.path.join(ground_truth_csv_dir, csv_filename)
 
-            # Load the data
+            # load the data
             df_pred = pd.read_csv(pred_path)
             df_gt = pd.read_csv(gt_path)
 
-            # --- Create the plot ---
-            plt.figure(figsize=(15, 5)) # Create a wide figure to see the signal clearly
+            # --- create the plot ---
+            plt.figure(figsize=(15, 5)) # create a wide figure to see the signal clearly
             
             plt.plot(df_gt['time_seconds'], df_gt['voltage_mv'], label='Ground Truth', color='blue', linewidth=1.5)
             plt.plot(df_pred['time_seconds'], df_pred['voltage_mv'], label='Predicted Signal', color='red', linestyle='--', linewidth=1.5)
@@ -59,11 +59,11 @@ def main():
             plt.legend()
             plt.grid(True, linestyle=':')
             
-            # Save the plot to a file
+            # save the plot to a file
             output_plot_path = os.path.join(output_plot_dir, csv_filename.replace('.csv', '.png'))
             plt.savefig(output_plot_path, dpi=150)
             
-            # Close the plot to free up memory (CRITICAL in a loop)
+            # close the plot to free up memory (critical in a loop)
             plt.close()
 
         except Exception as e:

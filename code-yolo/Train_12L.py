@@ -1,4 +1,4 @@
-# --- File: train_yolov8.py ---
+# --- file: train_yolov8.py ---
 from ultralytics import YOLO
 import os
 
@@ -9,14 +9,14 @@ def main():
     results = None
     try:
         results = model.train(
-            # data='C:/Users/dgarc/Desktop/Dissertation/ecg-image-kit/Data/data.yaml',   # Path to your data configuration file
+            # data='c:/users/dgarc/desktop/dissertation/ecg-image-kit/data/data.yaml',   # path to your data configuration file
             data='/users/lip24dg/ecg/ecg-yolo/data_12L.yaml',
-            epochs=100,              # Number of epochs to train for
-            imgsz=640,               # Image size
-            batch=16,                 # Batch size
-            patience=20,             # Early stopping patience
+            epochs=100,              # number of epochs to train for
+            imgsz=640,               # image size
+            batch=16,                 # batch size
+            patience=20,             # early stopping patience
             project='/users/lip24dg/ecg/ecg-yolo/runs_12L',
-            name='yolo_ecg_model_12L',    # Name for training run folder
+            name='yolo_ecg_model_12L',    # name for training run folder
             device=[0, 1]
         )
     except Exception as e:
@@ -26,7 +26,7 @@ def main():
     
     try:
         if results and results.save_dir:
-            # The best model is automatically saved as 'best.pt' inside the run folder.
+            # the best model is automatically saved as 'best.pt' inside the run folder.
             print(f"Best model and results saved in: {results.save_dir}")
         else:
             save_path = os.path.join('/users/lip24dg/ecg/ecg-yolo/runs_12L', 'yolo_ecg_model_12L')

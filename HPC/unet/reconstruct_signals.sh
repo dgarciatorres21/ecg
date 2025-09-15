@@ -6,18 +6,18 @@
 #SBATCH --output=/users/lip24dg/ecg/HPC/logs_pipeline/reconstruct_D3_%A.out
 #SBATCH --error=/users/lip24dg/ecg/HPC/logs_pipeline/reconstruct_D3_%A.err
 
-# SETUP
+# setup
 module load Anaconda3/2024.02-1
 source /opt/apps/testapps/common/software/staging/Anaconda3/2024.02-1/etc/profile.d/conda.sh
 conda activate unet
 
-# PATHS HERE
+# paths here
 DATA_PATH="/mnt/parscratch/users/lip24dg/data/Generated_data/"
-# The folder containing the prediction masks from nnU-Net
+# the folder containing the prediction masks from nnU-net
 PREDICTIONS_FOLDER="${DATA_PATH}/ecg_predictions_D3_ensemble"
-# The folder where the final 1D signal CSV files will be saved
+# the folder where the final 1d signal csv files will be saved
 OUTPUT_CSV_FOLDER="${DATA_PATH}/reconstructed_signals_D3"
-# Python script
+# python script
 PYTHON_SCRIPT_PATH="/users/lip24dg/ecg/code-unet/reconstruct_signals.py"
 
 echo "Running signal reconstruction..."

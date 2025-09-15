@@ -11,13 +11,13 @@
 #SBATCH --mail-user=dgarcia3@sheffield.ac.uk
 #SBATCH --mail-type=FAIL,END
 
-# DIAGNOSTICS
-echo "========================================"
+# diagnostics
+echo "========================================="
 echo "YOLO Training Pipeline Job started on $(hostname) at $(date)"
 echo "Job ID: ${SLURM_JOB_ID}"
-echo "========================================"
+echo "========================================="
 
-# 1. VALIDATE SCRIPT ARGUMENT
+# 1. validate script argument
 BUCKET_TYPE=$1
 if [ -z "$BUCKET_TYPE" ]; then
     echo "FATAL ERROR: No bucket type specified for training. Usage: sbatch script.sh <bucket_name>"
@@ -25,26 +25,26 @@ if [ -z "$BUCKET_TYPE" ]; then
 fi
 echo "Processing generated data for bucket: ${BUCKET_TYPE}"
 
-# SETUP
+# setup
 echo "Setting up the job environment..."
 module load Anaconda3/2024.02-1
 source activate yolo
 echo "Conda environment 'yolo' activated."
 mkdir -p /users/lip24dg/ecg/HPC/logs_pipeline
 
-# ✅ CENTRALIZED AND DYNAMIC PATH CONFIGURATION
+# ✅ centralized and dynamic path configuration
 PROJECT_DIR="/users/lip24dg/ecg"
 YOLO_SCRIPTS_DIR="${PROJECT_DIR}/ecg-yolo"
 BASE_OUTPUT_DIR="/mnt/parscratch/users/lip24dg/data/final_dataset_augmented"
 BASE_INPUT_DIR="/mnt/parscratch/users/lip24dg/data/dataset"
 
 CONVERSION_INPUT_DIR="${BASE_INPUT_DIR}/Generated_Images"
-# Output directory for the generated YOLO label files (.txt)
+# output directory for the generated yolo label files (.txt)
 LABEL_OUTPUT_DIR="${BASE_OUTPUT_DIR}/yolo_labels_${BUCKET_TYPE}"
-# Output directory for the final split dataset (train/valid/test)
+# output directory for the final split dataset (train/valid/test)
 SPLIT_DATA_OUTPUT_DIR="${BASE_OUTPUT_DIR}/yolo_split_data_${BUCKET_TYPE}"
 
-# Print paths for easy debugging
+# print paths for easy debugging
 echo "Source Data Directory : ${CONVERSION_INPUT_DIR}"
 echo "YOLO Labels Directory : ${LABEL_OUTPUT_DIR}"
 echo "Split Data Directory  : ${SPLIT_DATA_OUTPUT_DIR}"
@@ -75,11 +75,11 @@ if [ $? -ne 0 ]; then
     exit 1
 fi
 
-echo "========================================"
+echo "========================================="
 echo "Pipeline completed successfully for bucket: ${BUCKET_TYPE}"
-echo "========================================"
+echo "========================================="
 
-# Step 3: Train the YOLOv8 model
+# step 3: train the yolov8 model
 echo "Step 3: Training the model"
 python "${YOLO_SCRIPTS_DIR}/Train.py"
 if [ $? -ne 0 ]; then

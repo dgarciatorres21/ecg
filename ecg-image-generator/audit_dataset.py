@@ -2,22 +2,23 @@ import os
 import argparse
 from collections import defaultdict
 
-# Scans a directory for ECG records and reports on the completeness of .dat/.hea pairs.
+# scans a directory for ecg records and reports on the completeness of .dat/.hea pairs.
 def audit_wfdb_records(directory_path: str):
-    # Check if the directory exists before proceeding
+    # check if the directory exists before proceeding
     if not os.path.isdir(directory_path):
         print(f"--- FATAL ERROR ---")
         print(f"Directory not found at: '{directory_path}'")
         print("Please provide a valid path.")
         return
 
-    print(f"--- Starting WFDB Record Audit of Directory: {directory_path} ---\n")
-    # Dictionary to hold the records and their found extensions
+    print(f"--- Starting WFDB Record Audit of Directory: {directory_path} ---\
+")
+    # dictionary to hold the records and their found extensions
     records = defaultdict(set)
 
     target_extensions = {'.dat', '.hea'}
     
-    # --- Step 1: Recursively scan the directory and collect file info ---
+    # --- step 1: recursively scan the directory and collect file info ---
     print("Scanning for .dat and .hea files...")
     for root, _, files in os.walk(directory_path):
         for filename in files:
@@ -31,29 +32,29 @@ def audit_wfdb_records(directory_path: str):
         print("No .dat or .hea files were found in the specified directory.")
         return
 
-    # --- Step 2: Analyze the collected data ---
+    # --- step 2: analyze the collected data ---
     total_counts = defaultdict(int)
     incomplete_records = []
     
     expected_set = {'.dat', '.hea'}
 
-    # Sort the record keys for consistent output
+    # sort the record keys for consistent output
     sorted_record_keys = sorted(records.keys())
 
     for record_key in sorted_record_keys:
         found_extensions = records[record_key]
         
-        # Increment total counts
+        # increment total counts
         for ext in found_extensions:
             total_counts[ext] += 1
             
-        # Check if the record is incomplete
+        # check if the record is incomplete
         missing_extensions = expected_set - found_extensions
         if missing_extensions:
-            # Store the record key and a sorted list of what's missing
+            # store the record key and a sorted list of what's missing
             incomplete_records.append((record_key, sorted(list(missing_extensions))))
 
-    # --- Step 3: Print a clear and readable report ---
+    # --- step 3: print a clear and readable report ---
     print("\n--- Audit Report ---")
     print("\n[1] Total File Counts:")
     print(f"  - Found {total_counts['.dat']} '.dat' files.")

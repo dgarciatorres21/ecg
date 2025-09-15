@@ -6,7 +6,7 @@ from tqdm import tqdm
 
 TRAIN_RATIO = 0.7
 VALID_RATIO = 0.15
-# TEST_RATIO = 0.15
+# test_ratio = 0.15
 
 
 def split_data(image_source_dir, label_source_dir, output_dir):
@@ -19,7 +19,7 @@ def split_data(image_source_dir, label_source_dir, output_dir):
         print(f"FATAL ERROR: Label source directory not found at '{label_source_dir}'.")
         return
 
-    # Create the necessary output directories
+    # create the necessary output directories
     for split in ['train', 'valid', 'test']:
         os.makedirs(os.path.join(output_dir, split, 'images'), exist_ok=True)
         os.makedirs(os.path.join(output_dir, split, 'labels'), exist_ok=True)

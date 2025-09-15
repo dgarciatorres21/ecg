@@ -6,7 +6,7 @@ channels:
   - defaults
 
 dependencies:
-  # Packages
+  # packages
   - python=3.9
 
 

@@ -27,7 +27,7 @@ def get_parser():
     parser.add_argument('-t','--temperature',type=int,default=6500)
     return parser
 
-# Main function for running augmentations
+# main function for running augmentations
 def get_augment(input_file,output_directory,rotate=25,noise=25,crop=0.01,temperature=6500,bbox=False, store_text_bounding_box=False, json_dict=None):
     filename = input_file
     image = Image.open(filename)
@@ -49,7 +49,7 @@ def get_augment(input_file,output_directory,rotate=25,noise=25,crop=0.01,tempera
     h, w, _ = image.shape
     rot = random.randint(-rotate, rotate)
     crop_sample = random.uniform(0, crop)
-    #Augment in a sequential manner. Create an augmentation object
+    #augment in a sequential manner. create an augmentation object
     seq = iaa.Sequential([
           iaa.Affine(rotate=rot),
           iaa.AdditiveGaussianNoise(scale=(noise, noise)),
@@ -79,4 +79,3 @@ def get_augment(input_file,output_directory,rotate=25,noise=25,crop=0.01,tempera
     plt.imsave(fname=f,arr=images_aug[0])
 
     return f
-

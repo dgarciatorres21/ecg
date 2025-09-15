@@ -171,14 +171,14 @@ def rotate_points(pixel_coordinates, origin, angle):
                                [math.sin(angle), math.cos(angle)]])
     origin_point = np.array([ox, oy])
 
-    # The input `pixel_coordinates` is a list of lists (one list of points for each lead)
+    # the input `pixel_coordinates` is a list of lists (one list of points for each lead)
     for pixels_array in pixel_coordinates:
-        # If the list of points for a lead is empty, don't try to rotate it. Just append an empty list to the results and continue.
+        # if the list of points for a lead is empty, don't try to rotate it. just append an empty list to the results and continue.
         if len(pixels_array) == 0:
             rotates_pixel_coords.append([])
             continue
         
-        # Original logic is now safe to run
+        # original logic is now safe to run
         translated_points = np.array(pixels_array) - origin_point
         rotated_points = translated_points @ transformation.T + origin_point
         rotates_pixel_coords.append(np.round(rotated_points, 2).tolist())

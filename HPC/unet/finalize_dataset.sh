@@ -8,7 +8,7 @@
 #SBATCH --output=/users/lip24dg/ecg/HPC/logs_nnunet_prep/finalize_%A.out
 #SBATCH --error=/users/lip24dg/ecg/HPC/logs_nnunet_prep/finalize_%A.err
 
-# USAGE CHECK
+# usage check
 if [ -z "$1" ] || ( [ "$1" != "12L" ] && [ "$1" != "LL" ] ); then
     echo "ERROR: You must provide a valid model type as an argument."
     echo "Usage: sbatch finalize_dataset.sh 12L"
@@ -18,21 +18,21 @@ fi
 
 MODEL_TYPE=$1
 
-# SETUP
+# setup
 echo "--- Setting up environment for Finalizing Dataset"
 module load Anaconda3/2024.02-1
 source activate unet
 
-# Dynamically set the Dataset ID and Name based on the argument
+# dynamically set the dataset id and name based on the argument
 if [ "$MODEL_TYPE" == "12L" ]; then
     DATASET_ID=7
     DATASET_NAME="Dataset00${DATASET_ID}__12L"
-else # This will be the "LL" model
+else # this will be the "LL" model
     DATASET_ID=8
     DATASET_NAME="Dataset00${DATASET_ID}__LL"
 fi
 
-# DEFINE PATHS
+# define paths
 PYTHON_SCRIPT_PATH="/users/lip24dg/ecg/code-unet/create_json.py"
 DATASET_DIR="/mnt/parscratch/users/lip24dg/data/Generated_data/${DATASET_NAME}"
 

@@ -12,30 +12,30 @@ def vectorize_mask(mask_np):
     reconstructed_signal = np.zeros(width)
 
     for x in range(width):
-        # Find the y-coordinates of all non-zero pixels in the current column
+        # find the y-coordinates of all non-zero pixels in the current column
         y_coords = np.where(mask_np[:, x] > 0)[0]
         
         if len(y_coords) > 0:
-            # Calculate the mean y-coordinate (center of mass)
+            # calculate the mean y-coordinate (center of mass)
             reconstructed_signal[x] = np.mean(y_coords)
         else:
-            # If there's a gap in the signal, mark it as NaN (Not a Number)
+            # if there's a gap in the signal, mark it as nan (not a number)
             reconstructed_signal[x] = np.nan
             
     return reconstructed_signal
 
 def scale_signal(raw_signal_px, dpi, mm_per_mv, mm_per_second):
 
-    # Conversion factors
+    # conversion factors
     px_per_inch = dpi
     mm_per_inch = 25.4
     px_per_mm = px_per_inch / mm_per_inch
 
-    # Invert the y-axis because image coordinates start from the top
+    # invert the y-axis because image coordinates start from the top
     height = 180
     raw_signal_px = height/2 - raw_signal_px
 
-    # Scale to clinical units
+    # scale to clinical units
     voltage_mv = (raw_signal_px / px_per_mm) / mm_per_mv
     
     time_seconds = (np.arange(len(raw_signal_px)) / px_per_mm) / mm_per_second

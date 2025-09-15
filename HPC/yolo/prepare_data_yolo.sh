@@ -4,34 +4,34 @@
 #SBATCH --cpus-per-task=2
 #SBATCH --time=04:00:00
 #SBATCH --array=0-6
-#SBATCH --output=/users/lip24dg/ecg/HPC/logs_yolo/prep_%A_%a.out # %A=jobID, %a=arrayID
+#SBATCH --output=/users/lip24dg/ecg/HPC/logs_yolo/prep_%A_%a.out # %a=jobid, %a=arrayid
 #SBATCH --error=/users/lip24dg/ecg/HPC/logs_yolo/prep_%A_%a.err
 #SBATCH --mail-user=dgarcia3@sheffield.ac.uk
 #SBATCH --mail-type=FAIL,END
 
-# DIAGNOSTICS
-echo "========================================"
+# diagnostics
+echo "========================================="
 echo "Data Prep Job Array started on $(hostname) at $(date)"
 echo "Job ID: ${SLURM_JOB_ID}, Array Task ID: ${SLURM_ARRAY_TASK_ID}"
-echo "========================================"
+echo "========================================="
 
-# SETUP
+# setup
 echo "Setting up environment..."
 module load Anaconda3/2024.02-1
 source activate yolo
 
-# DEFINE BUCKETS
-# Create a bash array of your bucket names
+# define buckets
+# create a bash array of your bucket names
 BUCKETS=("Clean" "Scanner" "Physical" "Chaos")
-# Select the bucket for this specific job in the array
+# select the bucket for this specific job in the array
 BUCKET_TYPE=${BUCKETS[$SLURM_ARRAY_TASK_ID]}
 echo "--- Processing data for bucket: ${BUCKET_TYPE} ---"
 
-# PATH CONFIGURATION
+# path configuration
 YOLO_SCRIPTS_DIR="/users/lip24dg/ecg/ecg-yolo"
 BASE_OUTPUT_DIR="/mnt/parscratch/users/lip24dg/data/final_dataset_augmented"
 
-# Use a conditional to handle the different source path for the 'Clean' data
+# use a conditional to handle the different source path for the 'clean' data
 if [ "$BUCKET_TYPE" == "Clean" ]; then
     CONVERSION_INPUT_DIR="/mnt/parscratch/users/lip24dg/data/dataset/Generated_Images"
 else
@@ -45,7 +45,7 @@ echo "Source Dir: ${CONVERSION_INPUT_DIR}"
 echo "Label Dir:  ${LABEL_OUTPUT_DIR}"
 echo "Split Dir:  ${SPLIT_DATA_OUTPUT_DIR}"
 
-# EXECUTION
+# execution
 echo "--- Step 1: Converting JSON to YOLO format ---"
 python3 "${YOLO_SCRIPTS_DIR}/convert_to_yolo.py" \
     --data-dir "${CONVERSION_INPUT_DIR}" \

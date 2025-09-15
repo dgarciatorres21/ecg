@@ -1,6 +1,6 @@
 import os
 
-# This dictionary should point to the dataset you want to validate.
+# this dictionary should point to the dataset you want to validate.
 DATA_SOURCES = {
     "clean": {
         "images": "/mnt/parscratch/users/lip24dg/data/final_dataset_augmented_12L/Cropped_Images_Clean",
@@ -40,7 +40,7 @@ def validate_pairs():
         image_files = [f for f in os.listdir(image_dir) if f.endswith(".png")]
         
         for image_filename in image_files:
-            # The mask filename is assumed to be identical to the image filename.
+            # the mask filename is assumed to be identical to the image filename.
             mask_path = os.path.join(mask_dir, image_filename)
             
             if not os.path.exists(mask_path):
