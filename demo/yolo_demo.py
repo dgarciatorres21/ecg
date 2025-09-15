@@ -8,14 +8,14 @@ MODEL_TYPE_TO_RUN = '12L'
 
 # model paths
 MODELS = {
-    'LL': 'C:/Users/dgarc/Desktop/Dissertation/ecg-image-kit/codes/code-yolo/models/runs/yolo_ecg_model4/weights/best.pt',
-    '12L': 'C:/Users/dgarc/Desktop/Dissertation/ecg-image-kit/codes/code-yolo/models/runs_12L/yolo_ecg_model_12L3/weights/best.pt'
+    'LL': '../code-yolo/models/runs/yolo_ecg_model4/weights/best.pt',
+    '12L': '../code-yolo/models/runs_12L/yolo_ecg_model_12L3/weights/best.pt'
 }
 
 # directory to the image datasets
-INPUT_DIR = "C:/Users/dgarc/Desktop/Dissertation/ecg-image-kit/codes/demo/data/yolo/input"
+INPUT_DIR = "./data/yolo/input"
 # directory to save the output images
-OUTPUT_DIR = "C:/Users/dgarc/Desktop/Dissertation/ecg-image-kit/codes/demo/data/yolo/output/demo_predictions"
+OUTPUT_DIR = "./data/yolo/output/demo_predictions"
 
 
 print("Starting Local YOLO Model Demo")
