@@ -21,11 +21,11 @@ MODEL_TYPE=$1
 # Dynamically update the job name
 scontrol update jobid=${SLURM_JOB_ID} jobname=evaluate_${MODEL_TYPE}
 
-# SETUP
+# setup
 module load Anaconda3/2024.02-1
 source activate unet
 
-# CONFIGURATION
+# configuration
 export nnUNet_raw="/mnt/parscratch/users/lip24dg/data/Generated_data"
 export nnUNet_preprocessed="/mnt/parscratch/users/lip24dg/data/Generated_data/nnUNet_preprocessed"
 export nnUNet_results="/mnt/parscratch/users/lip24dg/data/Generated_data/nnUNet_results"
@@ -41,8 +41,7 @@ else # LL model
     TEST_SETS_BASE_DIR="/mnt/parscratch/users/lip24dg/data/Generated_data/structured_test_sets_LL"
 fi
 
-# Map the SLURM Array Task ID to the Test Set Name
-# This is the key to parallelization
+# Map the SLURM Array Task ID to the Test Set Name (parallelization)
 TEST_SETS_ARRAY=("test_clean" "test_scanner" "test_physical" "test_chaos")
 CURRENT_TEST_SET=${TEST_SETS_ARRAY[$SLURM_ARRAY_TASK_ID]}
 
@@ -58,7 +57,7 @@ OUTPUT_JSON="${nnUNet_results}/${DATASET_NAME}/evaluation/summary_${CURRENT_TEST
 DATASET_JSON_FILE="$nnUNet_raw/${DATASET_NAME}/dataset.json"
 PLANS_JSON_FILE="$nnUNet_results/${DATASET_NAME}/nnUNetTrainer__nnUNetPlans__2d/plans.json"
 
-# EVALUATION FOR THIS JOB'S ASSIGNED TEST SET
+# evaluation for this job's assigned test set
 echo "--- Starting Evaluation for ${MODEL_TYPE} on Test Set: ${CURRENT_TEST_SET}"
 mkdir -p "$(dirname "$OUTPUT_JSON")"
 

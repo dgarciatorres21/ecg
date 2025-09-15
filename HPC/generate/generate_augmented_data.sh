@@ -10,14 +10,14 @@
 #SBATCH --mail-user=dgarcia3@sheffield.ac.uk
 #SBATCH --mail-type=FAIL,END
 
-# DIAGNOSTICS
+# diagnostics
 echo "========================================"
 echo "Job started on $(hostname) at $(date)"
 echo "Job ID: ${SLURM_JOB_ID}, Array Task ID: ${SLURM_ARRAY_TASK_ID}"
 echo "========================================"
 
-# STEP 1: VALIDATE SCRIPT ARGUMENT
-# This script requires one argument: the type of bucket to generate.
+# step 1: validate script argument
+# this script requires one argument: the type of bucket to generate.
 BUCKET_TYPE=$1
 if [ -z "$BUCKET_TYPE" ]; then
     echo "FATAL ERROR: No bucket type specified."
@@ -26,25 +26,25 @@ if [ -z "$BUCKET_TYPE" ]; then
 fi
 echo "--- Generating augmentation bucket of type: ${BUCKET_TYPE}"
 
-# SETUP
+# setup
 echo "Setting up the job environment..."
 module load Anaconda3/2024.02-1
 source activate /users/lip24dg/.conda/envs/ecg
 echo "Conda environment 'ecg' activated. Using Python: $(which python)"
 echo "-----------------------------------------"
 
-# CENTRALIZED PATH CONFIGURATION
+# centralized path configuration
 SCRIPT_DIR="/users/lip24dg/ecg/ecg-image-generator"
 DATA_SOURCE_DIR="/mnt/parscratch/users/lip24dg/data/1.0.3/records500"
-BASE_OUTPUT_DIR="/mnt/parscratch/users/lip24dg/data/final_dataset_augmented" # Using a new base dir for clarity
+BASE_OUTPUT_DIR="/mnt/parscratch/users/lip24dg/data/final_dataset_augmented" # using a new base dir for clarity
 LOG_DIR="/users/lip24dg/ecg/HPC/logs_augment"
 
 mkdir -p $LOG_DIR
 
-# STEP 2: CONFIGURE BUCKET-SPECIFIC SETTINGS
-# Based on the script argument, set the output directories and augmentation flags.
+# step 2: configure bucket-specific settings
+# based on the script argument, set the output directories and augmentation flags.
 
-# Default empty array for augmentation flags
+# default empty array for augmentation flags
 AUGMENT_FLAGS=()
 
 case $BUCKET_TYPE in
@@ -85,15 +85,15 @@ case $BUCKET_TYPE in
     ;;
 esac
 
-# Create the specific directories for this run
+# create the specific directories for this run
 mkdir -p $GENERATED_IMAGE_DIR
 mkdir -p $GENERATED_MASK_DIR
 
 echo "Outputting images to: ${GENERATED_IMAGE_DIR}"
 echo "Outputting masks to:  ${GENERATED_MASK_DIR}"
 
-# STEP 3: RUN THE PYTHON SCRIPT WITH THE CORRECT CONFIGURATION
-TOTAL_JOBS=30 # Must match #SBATCH --array
+# step 3: run the python script with the correct configuration
+TOTAL_JOBS=30 # must match #sbatch --array
 
 python3 "${SCRIPT_DIR}/run_generation_500.py" \
     --script-to-run "${SCRIPT_DIR}/gen_ecg_images_from_data_batch.py" \
@@ -105,9 +105,9 @@ python3 "${SCRIPT_DIR}/run_generation_500.py" \
     --lead_bbox \
     --store_config \
     --generate_masks \
-    "${AUGMENT_FLAGS[@]}" # This correctly expands the array of flags
+    "${AUGMENT_FLAGS[@]}" # this correctly expands the array of flags
 
-# FINAL DIAGNOSTICS
+# final diagnostics
 echo "-----------------------------------------"
 echo "Job finished with exit code $?"
 echo "Job finished at $(date)"
