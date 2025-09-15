@@ -33,13 +33,13 @@ LOG_DIR="/users/lip24dg/ecg/HPC/logs_500"
 # Define the bucket type statically for this script
 BUCKET_TYPE="Clean"
 
-# CHANGED: Derive paths using the BUCKET_TYPE variable for consistency
+# Generated paths use the BUCKET_TYPE for clarity
 GENERATED_IMAGE_DIR="${BASE_OUTPUT_DIR}/Generated_Images_${BUCKET_TYPE}"
 GENERATED_MASK_DIR="${BASE_OUTPUT_DIR}/Generated_Masks_${BUCKET_TYPE}"
 
 TOTAL_JOBS=30
 
-# STAGE 1: GENERATE IMAGES AND MASKS (CLEAN)
+# STAGE 1: GENERATE IMAGES AND MASKS
 echo "--- STAGE 1: GENERATING IMAGES AND MASKS ---"
 python3 "${SCRIPT_DIR}/run_generation_500.py" \
     --script-to-run "${SCRIPT_DIR}/gen_ecg_images_from_data_batch.py" \
@@ -53,7 +53,7 @@ python3 "${SCRIPT_DIR}/run_generation_500.py" \
     --generate_masks
 
 
-# STAGE 2: AUDIT SOURCE DATA (Optional - runs only on the first job)
+# STAGE 2: AUDIT SOURCE DATA (runs only on the first job)
 if [ "$SLURM_ARRAY_TASK_ID" -eq 0 ]; then
     echo "--- STAGE 2: AUDITING SOURCE DATA (Job 0 Only) ---"
     python3 "${SCRIPT_DIR}/audit_wfdb_records.py" --directory "$DATA_SOURCE_DIR"
