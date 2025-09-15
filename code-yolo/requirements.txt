@@ -1,0 +1,10 @@
+torch
+torchvision
+numpy
+matplotlib
+opencv-python
+ultralytics
+opencv-python-headless<4.9
+scikit-learn
+psutil
+tensorboard

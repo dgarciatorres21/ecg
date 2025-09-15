@@ -1,0 +1,14 @@
+{
+    "channel_names": {
+        "0": "ecg_lead"
+    },
+    "labels": {
+        "background": 0,
+        "foreground": 1
+    },
+    "numTraining": 44707,
+    "file_ending": ".nii.gz",
+    "name": "ECG_12L_ROBUST",
+    "description": "12-lead ECG images from multiple augmentation sources",
+    "license": "private"
+}
