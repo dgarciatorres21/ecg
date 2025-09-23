@@ -2,9 +2,9 @@
 
 This project contains code for working with ECG images, including UNet and YOLO models. The following image shows the pipeline 
 
-<center>
-  <img src=“pipeline.png" alt="pipeline" width="400">
-</center>
+<div align="center">
+  <img src="pipeline.png" alt="pipeline" width="500">
+</div>
 ## Directories
 
 *   **code-unet**: Contains code related to the nnU-Net model.
