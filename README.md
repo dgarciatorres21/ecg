@@ -1,6 +1,6 @@
 # ECG Project
 
-This project contains code for working with ECG images, including UNet and YOLO models. The following image shows the pipeline 
+This project contains code for working with ECG images, including nnU-Net and YOLOv8 models. The following image shows the pipeline 
 
 <div align="center">
   <img src="pipeline.png" alt="pipeline" width="500">
