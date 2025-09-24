@@ -21,17 +21,25 @@ This project provides a complete workflow for processing ECG images by integrati
     cd ecg
     ```
 
-2.  **Set up the environment:**
-    This project uses both a Conda `environment.yml` and `requirements.txt` files.
+2.  **Set up the environments:**
+    This project requires separate Conda environments for different components.
 
-    - For the YOLOv8 environment:
+    - **Image Generation Environment:**
+      ```bash
+      conda create --name ecg python=3.10 -y
+      conda activate ecg
+      pip install -r ecg-image-generator/requirements.txt
+      ```
+    - **YOLOv8 Environment:**
       ```bash
       conda env create -f code-yolo/environment.yml
-      conda activate yolo-env
+      conda activate yolo
       ```
-    - For the ECG image generator:
+    - **nnU-Net Environment:**
       ```bash
-      pip install -r ecg-image-generator/requirements.txt
+      conda create --name unet python=3.10 -y
+      conda activate unet
+      pip install -r code-unet/requirements.txt
       ```
 
 ## Usage
@@ -57,7 +65,7 @@ To train the YOLOv8 model, use the training script:
 
 ```bash
 # Activate the correct conda environment first
-conda activate yolo-env
+conda activate yolo
 python code-yolo/Train.py
 ```
 

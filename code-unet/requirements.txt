@@ -1,0 +1,7 @@
+numpy
+SimpleITK
+opencv-python
+tqdm
+pandas
+matplotlib
+nnunetv2

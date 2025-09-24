@@ -32,17 +32,18 @@ source activate yolo
 echo "Conda environment 'yolo' activated."
 mkdir -p /users/lip24dg/ecg/HPC/logs_pipeline
 
-# ✅ centralized and dynamic path configuration
+# centralized and dynamic path configuration
 PROJECT_DIR="/users/lip24dg/ecg"
 YOLO_SCRIPTS_DIR="${PROJECT_DIR}/ecg-yolo"
 BASE_OUTPUT_DIR="/mnt/parscratch/users/lip24dg/data/final_dataset_augmented"
 BASE_INPUT_DIR="/mnt/parscratch/users/lip24dg/data/dataset"
+RUNS_DIR="/users/lip24dg/ecg/ecg-yolo/runs" # Path to where YOLO saves training runs
 
 CONVERSION_INPUT_DIR="${BASE_INPUT_DIR}/Generated_Images"
-# output directory for the generated yolo label files (.txt)
 LABEL_OUTPUT_DIR="${BASE_OUTPUT_DIR}/yolo_labels_${BUCKET_TYPE}"
-# output directory for the final split dataset (train/valid/test)
 SPLIT_DATA_OUTPUT_DIR="${BASE_OUTPUT_DIR}/yolo_split_data_${BUCKET_TYPE}"
+TEST_IMAGES_DIR="${SPLIT_DATA_OUTPUT_DIR}/test/images" # Path for test images
+NNUNET_CROPPED_OUTPUT_DIR="${BASE_OUTPUT_DIR}/nnunet_cropped_output_${BUCKET_TYPE}"
 
 # print paths for easy debugging
 echo "Source Data Directory : ${CONVERSION_INPUT_DIR}"
@@ -54,7 +55,7 @@ if [ ! -d "$CONVERSION_INPUT_DIR" ]; then
     exit 1
 fi
 
-echo "Step 1: Converting JSON to YOLO format for bucket '${BUCKET_TYPE}'"
+echo "--- Step 1: Converting JSON to YOLO format for bucket '${BUCKET_TYPE}'"
 python3 "${YOLO_SCRIPTS_DIR}/convert_to_yolo.py" \
     --data-dir "${CONVERSION_INPUT_DIR}" \
     --output-dir "${LABEL_OUTPUT_DIR}"
@@ -64,7 +65,7 @@ if [ $? -ne 0 ]; then
     exit 1
 fi
 
-echo "Step 2: Splitting data"
+echo "--- Step 2: Splitting data"
 python3 "${YOLO_SCRIPTS_DIR}/split_data.py" \
     --image-source-dir "${CONVERSION_INPUT_DIR}" \
     --label-source-dir "${LABEL_OUTPUT_DIR}" \
@@ -75,14 +76,68 @@ if [ $? -ne 0 ]; then
     exit 1
 fi
 
-echo "========================================="
-echo "Pipeline completed successfully for bucket: ${BUCKET_TYPE}"
-echo "========================================="
-
-# step 3: train the yolov8 model
-echo "Step 3: Training the model"
+echo "--- Step 3: Training the model"
 python "${YOLO_SCRIPTS_DIR}/Train.py"
 if [ $? -ne 0 ]; then
     echo "ERROR: Step 3 (training) failed. Exiting."
     exit 1
 fi
+
+# --- POST-TRAINING STEPS ---
+
+echo "--- Step 4: Finding the latest training run directory..."
+LATEST_RUN_NUM=$(ls -d ${RUNS_DIR}/yolo_ecg_model* | grep -o '[0-9]*' | sort -n | tail -1)
+if [ -z "$LATEST_RUN_NUM" ]; then
+    LATEST_RUN_DIR_NAME="yolo_ecg_model"
+else
+    LATEST_RUN_DIR_NAME="yolo_ecg_model${LATEST_RUN_NUM}"
+fi
+BEST_MODEL_PATH="${RUNS_DIR}/${LATEST_RUN_DIR_NAME}/weights/best.pt"
+VIS_OUTPUT_DIR="/users/lip24dg/data/yolo_runs/${LATEST_RUN_DIR_NAME}/test_predictions_${BUCKET_TYPE}"
+echo "Found latest model path: ${BEST_MODEL_PATH}"
+
+echo "--- Step 5: Testing the best model"
+if [ ! -f "${BEST_MODEL_PATH}" ]; then
+   echo "ERROR: Could not find the trained model at ${BEST_MODEL_PATH}. Skipping test step."
+else
+   python "${YOLO_SCRIPTS_DIR}/Test.py" \
+       --model-path "${BEST_MODEL_PATH}" \
+       --image-dir "${TEST_IMAGES_DIR}" \
+       --output-dir "${VIS_OUTPUT_DIR}" \
+       --conf 0.5
+   if [ $? -ne 0 ]; then
+       echo "WARNING: Step 5 (testing) failed."
+   fi
+fi
+
+echo "--- Step 6: Evaluating standard per-class metrics"
+if [ ! -f "${BEST_MODEL_PATH}" ]; then
+    echo "ERROR: Model file not found at '${BEST_MODEL_PATH}'. Skipping evaluation."
+else
+    python "${YOLO_SCRIPTS_DIR}/evaluate_model.py" --model-path "${BEST_MODEL_PATH}"
+fi
+
+echo "--- Step 7: Evaluating advanced IoU per-class metrics"
+if [ ! -f "${BEST_MODEL_PATH}" ]; then
+    echo "ERROR: Model file not found at '${BEST_MODEL_PATH}'. Skipping IoU calculation."
+else
+    python "${YOLO_SCRIPTS_DIR}/iou_calculation.py" --model-path "${BEST_MODEL_PATH}"
+fi
+
+echo "--- Step 8: Cropping detected leads to create nnU-Net dataset"
+if [ ! -f "${BEST_MODEL_PATH}" ]; then
+    echo "ERROR: Model file not found at '${BEST_MODEL_PATH}'. Skipping nnU-Net preparation."
+else
+    python "${YOLO_SCRIPTS_DIR}/crop_leads_for_nnunet.py" \
+        --model-path "${BEST_MODEL_PATH}" \
+        --image-source-dir "${CONVERSION_INPUT_DIR}" \
+        --output-dir "${NNUNET_CROPPED_OUTPUT_DIR}" \
+        --conf 0.7
+    if [ $? -ne 0 ]; then
+        echo "WARNING: Step 8 (nnU-Net data preparation) failed."
+    fi
+fi
+
+echo "========================================="
+echo "Full pipeline completed successfully for bucket: ${BUCKET_TYPE}"
+echo "========================================="

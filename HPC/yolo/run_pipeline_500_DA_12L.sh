@@ -13,9 +13,17 @@
 
 # --- diagnostics ---
 echo "========================================="
-echo "YOLO Training Pipeline Job started on $(hostname) at $(date)"
+echo "YOLO 12L Training Pipeline Job started on $(hostname) at $(date)"
 echo "Job ID: ${SLURM_JOB_ID}"
 echo "========================================="
+
+# --- 1. validate script argument ---
+BUCKET_TYPE=$1
+if [ -z "$BUCKET_TYPE" ]; then
+    echo "FATAL ERROR: No bucket type specified for training. Usage: sbatch script.sh <bucket_name>"
+    exit 1
+fi
+echo "Processing 12L generated data for bucket: ${BUCKET_TYPE}"
 
 # --- setup ---
 echo "Setting up the job environment..."
@@ -24,71 +32,115 @@ source activate yolo
 echo "Conda environment 'yolo' activated."
 mkdir -p /users/lip24dg/ecg/HPC/logs_yolo
 
+# --- path configuration ---
 PROJECT_DIR="/users/lip24dg/ecg"
 YOLO_SCRIPTS_DIR="${PROJECT_DIR}/ecg-yolo"
 BASE_INPUT_DIR="/mnt/parscratch/users/lip24dg/data/final_dataset_augmented"
 BASE_OUTPUT_DIR="/mnt/parscratch/users/lip24dg/data/final_dataset_augmented_12L"
+RUNS_DIR="/users/lip24dg/ecg/ecg-yolo/runs_12L" # Path for 12L runs
 
-# --- dynamical paths based on the bucket_type ---
-# input directory for json/png files
-# conversion_input_dir="${base_input_dir}/generated_images_${bucket_type}"
-# output directory for the generated yolo label files (.txt)
+CONVERSION_INPUT_DIR="${BASE_INPUT_DIR}/Generated_Images_${BUCKET_TYPE}"
 LABEL_OUTPUT_DIR="${BASE_OUTPUT_DIR}/yolo_labels_${BUCKET_TYPE}"
-# # output directory for the final split dataset (train/valid/test)
-# split_data_output_dir="${base_output_dir}/yolo_split_data_${bucket_type}"
+SPLIT_DATA_OUTPUT_DIR="${BASE_OUTPUT_DIR}/yolo_split_data_${BUCKET_TYPE}"
+TEST_IMAGES_DIR="${SPLIT_DATA_OUTPUT_DIR}/test/images"
+NNUNET_CROPPED_OUTPUT_DIR="${BASE_OUTPUT_DIR}/nnunet_cropped_output_${BUCKET_TYPE}"
 
 # --- print paths for easy debugging ---
-# echo "source data directory : ${conversion_input_dir}"
-# echo "yolo labels directory : ${label_output_dir}"
-# echo "split data directory  : ${split_data_output_dir}"
+echo "Source Data Directory : ${CONVERSION_INPUT_DIR}"
+echo "YOLO Labels Directory : ${LABEL_OUTPUT_DIR}"
+echo "Split Data Directory  : ${SPLIT_DATA_OUTPUT_DIR}"
 
-# if [ ! -d "$conversion_input_dir" ]; then
-#     echo "fatal error: source data directory not found at ${conversion_input_dir}"
-#     exit 1
-# fi
+if [ ! -d "$CONVERSION_INPUT_DIR" ]; then
+    echo "FATAL ERROR: Source data directory not found at ${CONVERSION_INPUT_DIR}"
+    exit 1
+fi
 
 # --- pipeline execution ---
 
-# # step 1: convert json annotations to yolo format for the specified bucket
-# echo "--- step 1: converting json to yolo format for bucket '${bucket_type}' ---"
-# python3 "${yolo_scripts_dir}/convert_to_yolo_12l.py" \
-#     --data-dir "${conversion_input_dir}" \
-#     --output-dir "${label_output_dir}"
+echo "--- Step 1: Converting JSON to YOLO format for bucket '${BUCKET_TYPE}' ---"
+python3 "${YOLO_SCRIPTS_DIR}/convert_to_yolo_12L.py" \
+    --data-dir "${CONVERSION_INPUT_DIR}" \
+    --output-dir "${LABEL_OUTPUT_DIR}"
 
-# if [ $? -ne 0 ]; then
-#     echo "error: step 1 (convert_to_yolo) failed. exiting."
-#     exit 1
-# fi
+if [ $? -ne 0 ]; then
+    echo "ERROR: Step 1 (convert_to_yolo_12L) failed. Exiting."
+    exit 1
+fi
 
-# # step 2: split data into train/valid/test sets
-# echo "--- step 2: splitting data ---"
-# # note: the label source for this step is the output from the previous step.
-# python3 "${yolo_scripts_dir}/split_data.py" \
-#     --image-source-dir "${conversion_input_dir}" \
-#     --label-source-dir "${label_output_dir}" \
-#     --output-dir "${split_data_output_dir}"
+echo "--- Step 2: Splitting data ---"
+python3 "${YOLO_SCRIPTS_DIR}/split_data.py" \
+    --image-source-dir "${CONVERSION_INPUT_DIR}" \
+    --label-source-dir "${LABEL_OUTPUT_DIR}" \
+    --output-dir "${SPLIT_DATA_OUTPUT_DIR}"
 
-# if [ $? -ne 0 ]; then
-#     echo "error: step 2 (split_data) failed. exiting."
-#     exit 1
-# fi
+if [ $? -ne 0 ]; then
+    echo "ERROR: Step 2 (split_data) failed. Exiting."
+    exit 1
+fi
 
-# echo "========================================="
-# echo "pipeline completed successfully for bucket: ${bucket_type}"
-# echo "========================================="
-
-echo "========================================="
-echo "Start training"
-echo "========================================="
-
-# step 3: train the yolov8 model
-echo "--- Step 3: Training the model ---"
+echo "--- Step 3: Training the 12L model ---"
 python "${YOLO_SCRIPTS_DIR}/Train_12L.py"
 if [ $? -ne 0 ]; then
     echo "ERROR: Step 3 (training) failed. Exiting."
     exit 1
 fi
 
+# --- POST-TRAINING STEPS ---
+
+echo "--- Step 4: Finding the latest training run directory..."
+LATEST_RUN_NUM=$(ls -d ${RUNS_DIR}/yolo_ecg_model_12L* | grep -o '[0-9]*
+ | sort -n | tail -1)
+if [ -z "$LATEST_RUN_NUM" ]; then
+    LATEST_RUN_DIR_NAME="yolo_ecg_model_12L"
+else
+    LATEST_RUN_DIR_NAME="yolo_ecg_model_12L${LATEST_RUN_NUM}"
+fi
+BEST_MODEL_PATH="${RUNS_DIR}/${LATEST_RUN_DIR_NAME}/weights/best.pt"
+VIS_OUTPUT_DIR="/users/lip24dg/data/yolo_runs_12L/${LATEST_RUN_DIR_NAME}/test_predictions_${BUCKET_TYPE}"
+echo "Found latest model path: ${BEST_MODEL_PATH}"
+
+echo "--- Step 5: Testing the best model"
+if [ ! -f "${BEST_MODEL_PATH}" ]; then
+   echo "ERROR: Could not find the trained model at ${BEST_MODEL_PATH}. Skipping test step."
+else
+   python "${YOLO_SCRIPTS_DIR}/Test.py" \
+       --model-path "${BEST_MODEL_PATH}" \
+       --image-dir "${TEST_IMAGES_DIR}" \
+       --output-dir "${VIS_OUTPUT_DIR}" \
+       --conf 0.5
+   if [ $? -ne 0 ]; then
+       echo "WARNING: Step 5 (testing) failed."
+   fi
+fi
+
+echo "--- Step 6: Evaluating standard per-class metrics"
+if [ ! -f "${BEST_MODEL_PATH}" ]; then
+    echo "ERROR: Model file not found at '${BEST_MODEL_PATH}'. Skipping evaluation."
+else
+    python "${YOLO_SCRIPTS_DIR}/evaluate_model.py" --model-path "${BEST_MODEL_PATH}"
+fi
+
+echo "--- Step 7: Evaluating advanced IoU per-class metrics"
+if [ ! -f "${BEST_MODEL_PATH}" ]; then
+    echo "ERROR: Model file not found at '${BEST_MODEL_PATH}'. Skipping IoU calculation."
+else
+    python "${YOLO_SCRIPTS_DIR}/iou_calculation.py" --model-path "${BEST_MODEL_PATH}"
+fi
+
+echo "--- Step 8: Cropping detected leads to create nnU-Net dataset"
+if [ ! -f "${BEST_MODEL_PATH}" ]; then
+    echo "ERROR: Model file not found at '${BEST_MODEL_PATH}'. Skipping nnU-Net preparation."
+else
+    python "${YOLO_SCRIPTS_DIR}/crop_leads_for_nnunet.py" \
+        --model-path "${BEST_MODEL_PATH}" \
+        --image-source-dir "${CONVERSION_INPUT_DIR}" \
+        --output-dir "${NNUNET_CROPPED_OUTPUT_DIR}" \
+        --conf 0.7
+    if [ $? -ne 0 ]; then
+        echo "WARNING: Step 8 (nnU-Net data preparation) failed."
+    fi
+fi
+
 echo "========================================="
-echo "Finish training"
+echo "Full 12L pipeline completed successfully for bucket: ${BUCKET_TYPE}"
 echo "========================================="

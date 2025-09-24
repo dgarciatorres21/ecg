@@ -1,4 +1,4 @@
-name: yolo_env
+name: yolo
 
 channels:
   - pytorch
