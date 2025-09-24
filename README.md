@@ -69,13 +69,16 @@ conda activate yolo
 python code-yolo/Train.py
 ```
 
-### 3. Running the Demo
+### 3. Running the Demos
 
-A demo script is available to test the pipeline:
+This project includes separate demos for the YOLOv8 detection and the nnU-Net segmentation pipelines.
 
-```bash
-python demo/yolo_demo.py --input /path/to/input/image
-```
+-   **YOLOv8 Demo:** Runs inference on sample ECG images to detect lead boundaries.
+-   **nnU-Net Demo:** Runs the full segmentation and 1D signal reconstruction pipeline on sample cropped leads.
+
+For detailed, step-by-step instructions on how to prepare the data and execute each demo, please refer to the dedicated `README.md` located inside the `/demo` directory.
+
+[**>> View Demo Instructions (demo/README.md)**](./demo/README.md)
 
 ## Project Structure
 
@@ -135,3 +138,23 @@ python demo/yolo_demo.py --input /path/to/input/image
             -   **Step 9: Summarize Evaluation (`summarize_evaluation.sh`)**: This script provides a clean, tabular summary of the evaluation results.
             -   **Step 10: Run Custom Per-Lead Evaluation (`evaluate_unet_per_lead.sh`)**: This script runs a custom evaluation to calculate metrics (Dice, MSE, SNR) for each individual lead.
             -   **Step 11: Reconstruct 1D Signals (`reconstruct_signals.sh`)**: The final step in the pipeline. This script takes the 2D prediction masks from the nnU-Net model and converts them back into 1D time-series signals.
+
+## Results
+
+This section showcases the final output from the different models in the pipeline.
+
+### YOLOv8 Detection Results
+
+Here are some examples of the YOLOv8 model detecting the 12 leads and the long lead from full-page ECG images.
+
+<div align="center">
+  <img src="images/yolo_results.png" alt="YOLOv8 Results" width="700">
+</div>
+
+### nnU-Net Signal Reconstruction
+
+After the leads are segmented by nnU-Net, the 2D masks are converted back into 1D time-series data. The image below shows the reconstructed signal (red) overlaid on the original ground truth signal (blue).
+
+<div align="center">
+  <img src="images/signal_reconstruction.png" alt="Signal Reconstruction" width="700">
+</div>
