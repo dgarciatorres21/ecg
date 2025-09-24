@@ -1,38 +1,99 @@
 # ECG Project
 
-This project provides a complete workflow for processing ECG images by integrating synthetic ECG creation, YOLOv8 for object detection, nnU-Net for segmentation. The image below visualizes each stage of this pipeline.
+This project provides a complete workflow for processing ECG images by integrating synthetic ECG creation, YOLOv8 for object detection, and nnU-Net for segmentation. The image below visualizes each stage of this pipeline.
 <div align="center">
   <img src="images/pipeline.png" alt="pipeline" width="500">
 </div>
 
-## Directories
-*   **ecg-image-generator**:
-Contains scripts for generating ECG images from data. This is a modification of the original [ecg-image-kit](https://github.com/alphanumericslab/ecg-image-kit).
-*   **code-unet**: Contains code related to the nnU-Net model.
-*   **code-yolo**: Contains code related to the YOLOv8 model for object detection on ECG images.
-*   **demo**: Contains scripts and data for demonstrating the YOLOv8 and nnU-Net models.
-  
-*   **HPC**: Contains scripts for running code on a High-Performance Computing cluster.
+## Getting Started
 
-    *   **ecg_generator**:
-        *   `generate_data.sh`: This script generates a "clean" version of the ECG image dataset. It runs a Python script to convert ECG data into images and corresponding masks without applying any visual augmentations. It also performs an audit of the source data. The following image is an example of a **"clean"** ECG:
-        <div align="center">
-          <img src="images/clean_example.png" alt="clean" width="300">
-        </div>
-        
-        *   `generate_augmented_data.sh`: This script generates augmented versions of the ECG dataset. It takes an argument that specifies the type of augmentation to apply, such as "scanner" (simulating scanner noise and rotation), "physical" (simulating wrinkled paper), or "chaos" (a combination of augmentations). Based on the chosen type, it passes different flags to the same underlying Python generation script. The following images are example of each inperfection:
+### Prerequisites
 
-            *   **"Scanner":**
+- Anaconda or Miniconda
+- Python 3.10
+- Git
+
+### Installation
+
+1.  **Clone the repository:**
+    ```bash
+    git clone <your-repository-url>
+    cd ecg
+    ```
+
+2.  **Set up the environment:**
+    This project uses both a Conda `environment.yml` and `requirements.txt` files.
+
+    - For the YOLOv8 environment:
+      ```bash
+      conda env create -f code-yolo/environment.yml
+      conda activate yolo-env
+      ```
+    - For the ECG image generator:
+      ```bash
+      pip install -r ecg-image-generator/requirements.txt
+      ```
+
+## Usage
+
+### 1. Generating ECG Images
+
+To generate a batch of clean ECG images, you can use the HPC script:
+
+```bash
+sbatch HPC/generator/generate_data.sh
+```
+
+To generate augmented images, specify the augmentation type:
+
+```bash
+# Example for 'scanner' type augmentation
+sbatch HPC/generator/generate_augmented_data.sh scanner
+```
+
+### 2. Training the YOLOv8 Model
+
+To train the YOLOv8 model, use the training script:
+
+```bash
+# Activate the correct conda environment first
+conda activate yolo-env
+python code-yolo/Train.py
+```
+
+### 3. Running the Demo
+
+A demo script is available to test the pipeline:
+
+```bash
+python demo/yolo_demo.py --input /path/to/input/image
+```
+
+## Project Structure
+
+-   `ecg-image-generator/`: Scripts for generating synthetic ECG images. This is a modification of the original [ecg-image-kit](https://github.com/alphanumericslab/ecg-image-kit).
+-   `code-yolo/`: Contains all code for the YOLOv8 object detection model.
+-   `code-unet/`: Contains all code for the nnU-Net segmentation model.
+-   `demo/`: Scripts and sample data for demonstrating the models.
+-   `HPC/`: Shell scripts for running jobs on a High-Performance Computing (HPC) cluster.
+    -   `generator/`:
+        -   `generate_data.sh`: This script generates a "clean" version of the ECG image dataset. It runs a Python script to convert ECG data into images and corresponding masks without applying any visual augmentations. It also performs an audit of the source data. The following image is an example of a **"clean"** ECG:
+            <div align="center">
+              <img src="images/clean_example.png" alt="clean" width="300">
+            </div>
+        -   `generate_augmented_data.sh`: This script generates augmented versions of the ECG dataset. It takes an argument that specifies the type of augmentation to apply, such as "scanner" (simulating scanner noise and rotation), "physical" (simulating wrinkled paper), or "chaos" (a combination of augmentations). Based on the chosen type, it passes different flags to the same underlying Python generation script. The following images are example of each inperfection:
+
+            -   **"Scanner":**
             <div align="center">
               <img src="images/scanner_imperfections_example.png" alt="clean" width="300">
             </div>
             
-            *   **"Physical":**
+            -   **"Physical":**
             <div align="center">
               <img src="images/physical_imperfections_example.png" alt="clean" width="300">
             </div>
             
-            *   **"Chaos":**
+            -   **"Chaos":**
             <div align="center">
               <img src="images/chaos_imperfections_example.png" alt="clean" width="300">
             </div>
