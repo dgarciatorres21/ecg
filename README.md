@@ -17,7 +17,7 @@ This project provides a complete workflow for processing ECG images by integrati
 
 1.  **Clone the repository:**
     ```bash
-    git clone <your-repository-url>
+    git clone [<your-repository-url>](https://github.com/dgarciatorres21/ecg.git)
     cd ecg
     ```
 
