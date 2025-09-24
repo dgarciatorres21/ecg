@@ -106,6 +106,9 @@ python demo/yolo_demo.py --input /path/to/input/image
               <img src="images/chaos_imperfections_example.png" alt="clean" width="300">
             </div>
     -   `yolo/`: Scripts for running the YOLOv8 pipeline on the HPC cluster. The pipeline can be executed in two ways:
+        <div align="center">
+          <img src="images/YOLOv8_pipeline.png" alt="YOLOv8 Pipeline" width="700">
+        </div>
         -   **All-in-One Pipelines:** These scripts run the entire workflow from data preparation to evaluation.
             -   `yolo_pipeline.sh`: Runs the full pipeline on the clean, baseline dataset.
             -   `yolo_pipeline_DA_exp.sh`: Runs the full pipeline on augmented datasets (both 12-lead and long lead).
@@ -115,6 +118,9 @@ python demo/yolo_demo.py --input /path/to/input/image
             2.  `train_yolo.sh`: Trains the YOLOv8 model on the prepared data.
             3.  `evaluation_yolo.sh`: Runs evaluation scripts on the trained model to assess its performance.
     -   `unet/`: Scripts for running the nnU-Net pipeline on the HPC cluster. The pipeline is divided into three main phases: Data Preparation, Training, and Evaluation. You must specify the model type (`12L` or `LL`) for most scripts.
+        <div align="center">
+          <img src="images/nnunet_pipeline.png" alt="nnU-Net Pipeline" width="700">
+        </div>
         -   **Phase 1: Data Preparation**
             -   **Step 1: Crop Leads (`crop_12L.sh` or `crop_exp.sh`)**: These scripts take the full-page ECG images and use a trained YOLO model to crop out the individual lead boxes. This must be run for each data bucket (e.g., Clean, Scanner, Physical, Chaos).
             -   **Step 2: Validate Cropped Data (`validate_data_12L.sh` or `validate_data_exp.sh`)**: After cropping, run these scripts to ensure that every cropped image has a corresponding mask file.
