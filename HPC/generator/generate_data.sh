@@ -41,7 +41,7 @@ TOTAL_JOBS=30
 
 # stage 1: generate images and masks
 echo "--- STAGE 1: GENERATING IMAGES AND MASKS ---"
-python3 "${SCRIPT_DIR}/run_generation_500.py" \
+python3 "${SCRIPT_DIR}/ecg_generation.py" \
     --script-to-run "${SCRIPT_DIR}/gen_ecg_images_from_data_batch.py" \
     --data-root-dir "$DATA_SOURCE_DIR" \
     --image-output-dir "$GENERATED_IMAGE_DIR" \

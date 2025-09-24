@@ -95,7 +95,7 @@ echo "Outputting masks to:  ${GENERATED_MASK_DIR}"
 # step 3: run the python script with the correct configuration
 TOTAL_JOBS=30 # must match #sbatch --array
 
-python3 "${SCRIPT_DIR}/run_generation_500.py" \
+python3 "${SCRIPT_DIR}/ecg_generation.py" \
     --script-to-run "${SCRIPT_DIR}/gen_ecg_images_from_data_batch.py" \
     --data-root-dir "$DATA_SOURCE_DIR" \
     --image-output-dir "$GENERATED_IMAGE_DIR" \
@@ -111,4 +111,4 @@ python3 "${SCRIPT_DIR}/run_generation_500.py" \
 echo "-----------------------------------------"
 echo "Job finished with exit code $?"
 echo "Job finished at $(date)"
-echo "========================================"
+echo "========================================
