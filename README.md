@@ -44,39 +44,69 @@ This project provides a complete workflow for processing ECG images by integrati
 
 ## Usage
 
+This section provides high-level commands for the most common tasks. For a detailed, step-by-step guide on the HPC pipelines, please see the `yolo` and `unet` subsections under **Project Structure**.
+
 ### 1. Generating ECG Images
 
 To generate a batch of clean ECG images, you can use the HPC script:
-
 ```bash
 sbatch HPC/generator/generate_data.sh
 ```
-
-To generate augmented images, specify the augmentation type:
-
+To generate augmented images, specify the augmentation type (e.g., `scanner`):
 ```bash
-# Example for 'scanner' type augmentation
 sbatch HPC/generator/generate_augmented_data.sh scanner
 ```
 
-### 2. Training the YOLOv8 Model
+### 2. Training the Models
 
-To train the YOLOv8 model, use the training script:
-
+#### YOLOv8 Model
+To train the YOLOv8 model on a specific data bucket, use the `train_yolo.sh` script:
 ```bash
-# Activate the correct conda environment first
-conda activate yolo
-python code-yolo/Train.py
+# Example for the 'clean' data bucket
+sbatch HPC/yolo/train_yolo.sh clean
 ```
 
-### 3. Running the Demos
+#### nnU-Net Model
+To train the nnU-Net model for a specific model type (`12L` or `LL`), use the `train_unet.sh` script. This will automatically train all 5 cross-validation folds in parallel.
+```bash
+# Example for the 12L model
+sbatch HPC/unet/train_unet.sh 12L
+```
+
+### 3. Evaluating the Models
+
+After training, you can evaluate model performance.
+
+#### YOLOv8 Model
+To run the full evaluation suite (testing and metrics) on the last trained YOLOv8 model:
+```bash
+sbatch HPC/yolo/evaluation_yolo.sh
+```
+
+#### nnU-Net Model
+Evaluation for nnU-Net is a multi-step process that should be run after training is complete.
+
+1.  **Generate Predictions** for each test set you want to evaluate:
+    ```bash
+    # Example for the 12L model on the 'test_clean' set
+    sbatch HPC/unet/predict_parallel.sh 12L test_clean
+    ```
+2.  **Run Standard Evaluation** on the generated predictions:
+    ```bash
+    sbatch HPC/unet/evaluate_unet.sh 12L
+    ```
+3.  **Summarize Results** into a final table:
+    ```bash
+    sbatch HPC/unet/summarize_evaluation.sh 12L
+    ```
+
+### 4. Running the Demos
 
 This project includes separate demos for the YOLOv8 detection and the nnU-Net segmentation pipelines.
-
 -   **YOLOv8 Demo:** Runs inference on sample ECG images to detect lead boundaries.
 -   **nnU-Net Demo:** Runs the full segmentation and 1D signal reconstruction pipeline on sample cropped leads.
 
-For detailed, step-by-step instructions on how to prepare the data and execute each demo, please refer to the dedicated `README.md` located inside the `/demo` directory.
+For detailed, step-by-step instructions, please refer to the dedicated `README.md` inside the `/demo` directory.
 
 [**>> View Demo Instructions (demo/README.md)**](./demo/README.md)
 
