@@ -1,4 +1,4 @@
-# ECG Project
+# ECG Digitization Project
 
 This project provides a complete workflow for processing ECG images by integrating synthetic ECG creation, YOLOv8 for object detection, and nnU-Net for segmentation. The image below visualizes each stage of this pipeline.
 <div align="center">
