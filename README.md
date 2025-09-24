@@ -157,7 +157,7 @@ Here are some examples of the YOLOv8 model detecting the 12 leads and the long l
 
 ### nnU-Net Signal Reconstruction
 
-After the leads are segmented by nnU-Net, the 2D masks are converted back into 1D time-series data. The image below shows the reconstructed signal (red) overlaid on the original ground truth signal (blue).
+After the leads are segmented by nnU-Net, the 2D masks are converted back into 1D time-series data. The image below shows the demonstration of the signal reconstruction pipeline for a single lead (03620 hr-0 aVL). The figure illustrates the process from left to right: (1) the cropped 2D input image, (2) the predicted segmentation mask overlaid, and (3) the final calibrated 1D time-series signal.
 
 <div align="center">
   <img src="images/signal_reconstruction.png" alt="Signal Reconstruction" width="700">
