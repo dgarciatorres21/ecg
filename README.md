@@ -92,6 +92,7 @@ For detailed, step-by-step instructions on how to prepare the data and execute e
             <div align="center">
               <img src="images/clean_example.png" alt="clean" width="300">
             </div>
+            
         -   `generate_augmented_data.sh`: This script generates augmented versions of the ECG dataset. It takes an argument that specifies the type of augmentation to apply, such as "scanner" (simulating scanner noise and rotation), "physical" (simulating wrinkled paper), or "chaos" (a combination of augmentations). Based on the chosen type, it passes different flags to the same underlying Python generation script. The following images are example of each inperfection:
 
             -   **"Scanner":**
@@ -108,10 +109,12 @@ For detailed, step-by-step instructions on how to prepare the data and execute e
             <div align="center">
               <img src="images/chaos_imperfections_example.png" alt="clean" width="300">
             </div>
+            
     -   `yolo/`: Scripts for running the YOLOv8 pipeline on the HPC cluster. The pipeline can be executed in two ways:
         <div align="center">
           <img src="images/YOLOv8_pipeline.png" alt="YOLOv8 Pipeline" width="700">
         </div>
+        
         -   **All-in-One Pipelines:** These scripts run the entire workflow from data preparation to evaluation.
             -   `yolo_pipeline.sh`: Runs the full pipeline on the clean, baseline dataset.
             -   `yolo_pipeline_DA_exp.sh`: Runs the full pipeline on augmented datasets (both 12-lead and long lead).
@@ -124,6 +127,7 @@ For detailed, step-by-step instructions on how to prepare the data and execute e
         <div align="center">
           <img src="images/nnunet_pipeline.png" alt="nnU-Net Pipeline" width="700">
         </div>
+        
         -   **Phase 1: Data Preparation**
             -   **Step 1: Crop Leads (`crop_12L.sh` or `crop_exp.sh`)**: These scripts take the full-page ECG images and use a trained YOLO model to crop out the individual lead boxes. This must be run for each data bucket (e.g., Clean, Scanner, Physical, Chaos).
             -   **Step 2: Validate Cropped Data (`validate_data_12L.sh` or `validate_data_exp.sh`)**: After cropping, run these scripts to ensure that every cropped image has a corresponding mask file.
