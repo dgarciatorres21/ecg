@@ -105,3 +105,12 @@ python demo/yolo_demo.py --input /path/to/input/image
             <div align="center">
               <img src="images/chaos_imperfections_example.png" alt="clean" width="300">
             </div>
+    -   `yolo/`: Scripts for running the YOLOv8 pipeline on the HPC cluster. The pipeline can be executed in two ways:
+        -   **All-in-One Pipelines:** These scripts run the entire workflow from data preparation to evaluation.
+            -   `yolo_pipeline.sh`: Runs the full pipeline on the clean, baseline dataset.
+            -   `yolo_pipeline_DA_exp.sh`: Runs the full pipeline on augmented datasets (both 12-lead and long lead).
+            -   `yolo_pipeline_DA_12L.sh`: Runs the full pipeline on the 12-lead augmented dataset.
+        -   **Step-by-Step Execution:** For more granular control, the pipeline can be run in separate stages.
+            1.  `prepare_data_yolo.sh`: Prepares the data by converting annotations and splitting into train/validation/test sets.
+            2.  `train_yolo.sh`: Trains the YOLOv8 model on the prepared data.
+            3.  `evaluation_yolo.sh`: Runs evaluation scripts on the trained model to assess its performance.
