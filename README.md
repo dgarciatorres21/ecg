@@ -114,3 +114,18 @@ python demo/yolo_demo.py --input /path/to/input/image
             1.  `prepare_data_yolo.sh`: Prepares the data by converting annotations and splitting into train/validation/test sets.
             2.  `train_yolo.sh`: Trains the YOLOv8 model on the prepared data.
             3.  `evaluation_yolo.sh`: Runs evaluation scripts on the trained model to assess its performance.
+    -   `unet/`: Scripts for running the nnU-Net pipeline on the HPC cluster. The pipeline is divided into three main phases: Data Preparation, Training, and Evaluation. You must specify the model type (`12L` or `LL`) for most scripts.
+        -   **Phase 1: Data Preparation**
+            -   **Step 1: Crop Leads (`crop_12L.sh` or `crop_exp.sh`)**: These scripts take the full-page ECG images and use a trained YOLO model to crop out the individual lead boxes. This must be run for each data bucket (e.g., Clean, Scanner, Physical, Chaos).
+            -   **Step 2: Validate Cropped Data (`validate_data_12L.sh` or `validate_data_exp.sh`)**: After cropping, run these scripts to ensure that every cropped image has a corresponding mask file.
+            -   **Step 3: Create Master File List (`create_file_list.sh`)**: This script scans all the different cropped data directories and generates a single master text file containing all unique ECG IDs.
+            -   **Step 4: Finalize Dataset (`finalize_dataset.sh`)**: This script creates the `dataset.json` file that is required by nnU-Net.
+            -   **Step 5: Preprocess Data (`preprocess.sh`)**: This is a standard nnU-Net step that runs `nnUNetv2_plan_and_preprocess`.
+        -   **Phase 2: Training**
+            -   **Step 6: Train the Model (`train_unet.sh`)**: This script starts the nnU-Net training process. It is configured as a SLURM job array to automatically train the 5 cross-validation folds in parallel.
+        -   **Phase 3: Prediction & Evaluation**
+            -   **Step 7: Run Prediction (`predict_parallel_gpu.sh` or `predict_parallel_cpu.sh`)**: Once a model is trained, use these scripts to generate predictions on the test sets. This proces can be done with GPU or CPU.
+            -   **Step 8: Evaluate Predictions (`evaluate_unet.sh`)**: This script runs the standard nnU-Net evaluation on the predictions generated in the previous step.
+            -   **Step 9: Summarize Evaluation (`summarize_evaluation.sh`)**: This script provides a clean, tabular summary of the evaluation results.
+            -   **Step 10: Run Custom Per-Lead Evaluation (`evaluate_unet_per_lead.sh`)**: This script runs a custom evaluation to calculate metrics (Dice, MSE, SNR) for each individual lead.
+            -   **Step 11: Reconstruct 1D Signals (`reconstruct_signals.sh`)**: The final step in the pipeline. This script takes the 2D prediction masks from the nnU-Net model and converts them back into 1D time-series signals.
